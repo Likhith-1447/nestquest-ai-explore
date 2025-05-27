@@ -105,10 +105,12 @@ const Index = () => {
             </div>
             <nav className="hidden md:flex items-center space-x-8">
               <a href="#" className="text-gray-700 hover:text-purple-600 transition-colors">Explore</a>
-              <a href="#" className="text-gray-700 hover:text-purple-600 transition-colors">Host</a>
+              <Link to="/host" className="text-gray-700 hover:text-purple-600 transition-colors">Host</Link>
               <a href="#" className="text-gray-700 hover:text-purple-600 transition-colors">Help</a>
               <Button variant="outline" size="sm">Sign In</Button>
-              <Button className="gradient-ai text-white" size="sm">Sign Up</Button>
+              <Link to="/profile">
+                <Button className="gradient-ai text-white" size="sm">Profile</Button>
+              </Link>
             </nav>
           </div>
         </div>
@@ -148,9 +150,11 @@ const Index = () => {
                   <Button variant="ghost" size="sm" className="p-2">
                     <Camera className="w-5 h-5 text-gray-400" />
                   </Button>
-                  <Button className="gradient-ai text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity">
-                    Search
-                  </Button>
+                  <Link to="/search">
+                    <Button className="gradient-ai text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition-opacity">
+                      Search
+                    </Button>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -216,9 +220,11 @@ const Index = () => {
             <h2 className="text-3xl font-bold text-gray-900">
               Personalized for You
             </h2>
-            <Button variant="outline" className="hidden md:flex">
-              View All
-            </Button>
+            <Link to="/search">
+              <Button variant="outline" className="hidden md:flex">
+                View All
+              </Button>
+            </Link>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -272,9 +278,11 @@ const Index = () => {
                       <span className="text-lg font-bold text-gray-900">${property.price}</span>
                       <span className="text-gray-600 text-sm"> / night</span>
                     </div>
-                    <Button size="sm" className="gradient-ai text-white">
-                      Instant Book
-                    </Button>
+                    <Link to={`/property/${property.id}`}>
+                      <Button size="sm" className="gradient-ai text-white">
+                        Instant Book
+                      </Button>
+                    </Link>
                   </div>
                 </CardContent>
               </Card>
