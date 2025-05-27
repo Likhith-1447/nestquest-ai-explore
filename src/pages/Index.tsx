@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Search, MapPin, Star, Heart, Filter, Mic, Camera, Sparkles, Calendar, Users, Wifi, Car, Coffee, Mountain, Waves, TreePine, Building, Home } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
