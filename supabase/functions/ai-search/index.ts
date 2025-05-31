@@ -24,6 +24,7 @@ serve(async (req) => {
 
     const GOOGLE_AI_API_KEY = Deno.env.get('GOOGLE_AI_API_KEY')
     if (!GOOGLE_AI_API_KEY) {
+      console.error('Google AI API key not found')
       throw new Error('Google AI API key not configured')
     }
 
@@ -34,7 +35,7 @@ serve(async (req) => {
       location: prop.location,
       price: prop.price,
       rating: prop.rating,
-      tags: prop.tags
+      tags: prop.tags || []
     }))
 
     // Create a more focused prompt for Gemini
@@ -62,9 +63,9 @@ Provide a JSON response with exactly this structure:
 
 Focus on matching the search query "${query}" with the available properties. Provide specific reasons and realistic scores (70-95).`
 
-    console.log('Calling Google AI API...')
+    console.log('Calling Google AI API with key:', GOOGLE_AI_API_KEY ? 'Present' : 'Missing')
 
-    // Call Google AI (Gemini) with proper error handling
+    // Call Google AI (Gemini) API
     const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GOOGLE_AI_API_KEY}`, {
       method: 'POST',
       headers: {
@@ -103,6 +104,8 @@ Focus on matching the search query "${query}" with the available properties. Pro
       }),
     })
 
+    console.log('Google AI API response status:', response.status)
+
     if (!response.ok) {
       const errorText = await response.text()
       console.error('Google AI API error:', response.status, errorText)
@@ -110,7 +113,7 @@ Focus on matching the search query "${query}" with the available properties. Pro
     }
 
     const data = await response.json()
-    console.log('Google AI response received:', JSON.stringify(data, null, 2))
+    console.log('Google AI response received')
 
     const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text
     if (!aiResponse) {
@@ -120,7 +123,7 @@ Focus on matching the search query "${query}" with the available properties. Pro
 
     console.log('Raw AI response:', aiResponse)
 
-    // Try to parse JSON response with better error handling
+    // Parse JSON response with better error handling
     let parsedResponse
     try {
       // Clean the response text to extract JSON

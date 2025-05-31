@@ -43,6 +43,7 @@ export const useAISearch = () => {
       if (data?.success) {
         console.log('AI search successful:', data.data);
         setAiInsights(data.data);
+        setError(null); // Clear any previous errors
       } else {
         console.error('AI search failed:', data);
         throw new Error(data?.error || 'AI search failed');
