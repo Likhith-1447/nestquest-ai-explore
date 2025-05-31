@@ -1,15 +1,15 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, MapPin, Star, Heart, Sparkles, SlidersHorizontal, Bot, Map, RefreshCw } from 'lucide-react';
+import { Search, Filter, MapPin, Star, Heart, Sparkles, SlidersHorizontal, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Slider } from '@/components/ui/slider';
 import { Checkbox } from '@/components/ui/checkbox';
-import { useAISearch } from '@/hooks/useAISearch';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { usePropertyAI } from '@/hooks/usePropertyAI';
+import { AIInsightsBanner } from '@/components/AIInsightsBanner';
 
 const SearchResults = () => {
   const [showFilters, setShowFilters] = useState(false);
@@ -17,7 +17,7 @@ const SearchResults = () => {
   const [sortBy, setSortBy] = useState('ai-recommended');
   const [searchQuery, setSearchQuery] = useState('Mountain cabins in Colorado');
   
-  const { searchWithAI, aiInsights, isLoading: aiLoading, error: aiError } = useAISearch();
+  const { analyzeProperties, aiInsights, isLoading: aiLoading, error: aiError, clearInsights } = usePropertyAI();
 
   const searchResults = [
     {
@@ -80,13 +80,18 @@ const SearchResults = () => {
     instantBook: true
   };
 
-  // Trigger AI search when component mounts
+  // Trigger AI analysis when component mounts
   useEffect(() => {
-    searchWithAI(searchQuery, searchResults, 'vacation_rental');
+    analyzeProperties(searchQuery, searchResults, 'vacation_rental');
   }, []);
 
   const handleAIRefresh = () => {
-    searchWithAI(searchQuery, searchResults, 'vacation_rental');
+    analyzeProperties(searchQuery, searchResults, 'vacation_rental');
+  };
+
+  const handleNewSearch = () => {
+    clearInsights();
+    analyzeProperties(searchQuery, searchResults, 'vacation_rental');
   };
 
   const getAIRecommendationForProperty = (propertyId: number) => {
@@ -115,6 +120,11 @@ const SearchResults = () => {
                   className="pl-10 pr-4"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      handleNewSearch();
+                    }
+                  }}
                 />
               </div>
             </div>
@@ -132,7 +142,7 @@ const SearchResults = () => {
         {/* Search Summary & Filters */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">12 stays found</h2>
+            <h2 className="text-2xl font-bold text-gray-900">{searchResults.length} stays found</h2>
             <p className="text-gray-600">{searchQuery}</p>
           </div>
           <div className="flex items-center space-x-3">
@@ -217,53 +227,12 @@ const SearchResults = () => {
           {/* Results Grid */}
           <div className="flex-1">
             {/* AI Insights Banner */}
-            <Card className="mb-6 border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center">
-                    <Bot className="w-5 h-5 text-purple-600 mr-2" />
-                    <h3 className="font-semibold text-purple-800">AI Search Insights</h3>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleAIRefresh}
-                    disabled={aiLoading}
-                    className="text-purple-600"
-                  >
-                    <RefreshCw className={`w-4 h-4 ${aiLoading ? 'animate-spin' : ''}`} />
-                  </Button>
-                </div>
-                
-                {aiLoading && (
-                  <p className="text-purple-700 text-sm">AI is analyzing your search...</p>
-                )}
-                
-                {aiError && (
-                  <Alert className="mb-3">
-                    <AlertDescription className="text-red-700">
-                      {aiError}
-                    </AlertDescription>
-                  </Alert>
-                )}
-                
-                {aiInsights && !aiLoading && (
-                  <div className="space-y-2">
-                    <p className="text-purple-700 text-sm">{aiInsights.insight}</p>
-                    {aiInsights.market_analysis && (
-                      <p className="text-purple-600 text-xs">{aiInsights.market_analysis}</p>
-                    )}
-                  </div>
-                )}
-                
-                {!aiInsights && !aiLoading && !aiError && (
-                  <p className="text-purple-700 text-sm">
-                    Based on your preferences, we found mountain properties with excellent Wi-Fi ratings. 
-                    Peak season pricing is 23% higher than average for these dates.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+            <AIInsightsBanner
+              insights={aiInsights}
+              isLoading={aiLoading}
+              error={aiError}
+              onRefresh={handleAIRefresh}
+            />
 
             <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
               {searchResults.map((property) => {
@@ -307,12 +276,14 @@ const SearchResults = () => {
                         <MapPin className="w-3 h-3 mr-1" />
                         {property.location}
                       </p>
-                      <div className="bg-blue-50 rounded-lg p-2 mb-3">
-                        <p className="text-xs text-blue-700 font-medium">
-                          <Sparkles className="w-3 h-3 inline mr-1" />
-                          {aiRecommendation?.reason || property.aiHighlight}
-                        </p>
-                      </div>
+                      {aiRecommendation && (
+                        <div className="bg-blue-50 rounded-lg p-2 mb-3">
+                          <p className="text-xs text-blue-700 font-medium">
+                            <Sparkles className="w-3 h-3 inline mr-1" />
+                            {aiRecommendation.reason}
+                          </p>
+                        </div>
+                      )}
                       <div className="flex flex-wrap gap-1 mb-3">
                         {property.tags.map((tag) => (
                           <Badge key={tag} variant="secondary" className="text-xs">
@@ -336,19 +307,6 @@ const SearchResults = () => {
                 );
               })}
             </div>
-
-            {/* AI Tips Section */}
-            {aiInsights?.search_tips && (
-              <Card className="mt-6 border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50">
-                <CardContent className="p-4">
-                  <div className="flex items-center mb-2">
-                    <Sparkles className="w-5 h-5 text-blue-600 mr-2" />
-                    <h3 className="font-semibold text-blue-800">AI Search Tips</h3>
-                  </div>
-                  <p className="text-blue-700 text-sm">{aiInsights.search_tips}</p>
-                </CardContent>
-              </Card>
-            )}
 
             {/* Load More */}
             <div className="text-center mt-8">

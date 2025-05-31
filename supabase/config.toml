@@ -3,3 +3,6 @@ project_id = "mfoygzqlglsdpnhsiodu"
 
 [functions.ai-search]
 verify_jwt = false
+
+[functions.property-ai-search]
+verify_jwt = false
