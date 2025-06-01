@@ -1,102 +1,82 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Filter, MapPin, Star, Heart, Sparkles, SlidersHorizontal, Map } from 'lucide-react';
+import { Search, MapPin, Sparkles, SlidersHorizontal, Map, History } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Slider } from '@/components/ui/slider';
-import { Checkbox } from '@/components/ui/checkbox';
 import { usePropertyAI } from '@/hooks/usePropertyAI';
+import { usePropertyData } from '@/hooks/usePropertyData';
+import { useSearchHistory } from '@/hooks/useSearchHistory';
 import { AIInsightsBanner } from '@/components/AIInsightsBanner';
+import { PropertyCard } from '@/components/PropertyCard';
+import { SearchFilters, SearchFilters as SearchFiltersType } from '@/components/SearchFilters';
 
 const SearchResults = () => {
   const [showFilters, setShowFilters] = useState(false);
-  const [priceRange, setPriceRange] = useState([50, 300]);
-  const [sortBy, setSortBy] = useState('ai-recommended');
+  const [sortBy, setSortBy] = useState('newest');
   const [searchQuery, setSearchQuery] = useState('Mountain cabins in Colorado');
+  const [appliedFilters, setAppliedFilters] = useState<SearchFiltersType>({});
+  
+  const { 
+    properties, 
+    loading: propertiesLoading, 
+    error: propertiesError,
+    searchProperties,
+    fetchProperties 
+  } = usePropertyData();
   
   const { analyzeProperties, aiInsights, isLoading: aiLoading, error: aiError, clearInsights } = usePropertyAI();
+  const { searchHistory, addSearchQuery } = useSearchHistory();
 
-  const searchResults = [
-    {
-      id: 1,
-      title: "Mountain Cabin with Stunning Views",
-      location: "Aspen, Colorado",
-      price: 180,
-      rating: 4.9,
-      reviews: 127,
-      image: "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400&h=300&fit=crop",
-      aiMatch: 95,
-      aiHighlight: "Perfect for remote work with high-speed Wi-Fi",
-      tags: ["Mountain", "Wi-Fi", "Pet-friendly"],
-      instant: true
-    },
-    {
-      id: 2,
-      title: "Beachfront Villa Paradise",
-      location: "Malibu, California",
-      price: 320,
-      rating: 4.8,
-      reviews: 89,
-      image: "https://images.unsplash.com/photo-1502780402662-acc01917610e?w=400&h=300&fit=crop",
-      aiMatch: 88,
-      aiHighlight: "Exceptionally quiet after 8 PM",
-      tags: ["Beach", "Pool", "Luxury"],
-      instant: true
-    },
-    {
-      id: 3,
-      title: "Urban Loft in Arts District",
-      location: "Brooklyn, New York",
-      price: 125,
-      rating: 4.7,
-      reviews: 203,
-      image: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&h=300&fit=crop",
-      aiMatch: 82,
-      aiHighlight: "Great for photographers with amazing lighting",
-      tags: ["Urban", "Arts", "Trendy"],
-      instant: false
-    },
-    {
-      id: 4,
-      title: "Cozy Forest Retreat",
-      location: "Portland, Oregon",
-      price: 95,
-      rating: 4.9,
-      reviews: 156,
-      image: "https://images.unsplash.com/photo-1544967919-659d8ac8d0d8?w=400&h=300&fit=crop",
-      aiMatch: 91,
-      aiHighlight: "Perfect for digital detox and meditation",
-      tags: ["Forest", "Eco-friendly", "Quiet"],
-      instant: true
-    }
-  ];
-
-  const filters = {
-    propertyType: ['Entire place', 'Private room', 'Shared room'],
-    amenities: ['Wi-Fi', 'Kitchen', 'Parking', 'Pool', 'Pet-friendly', 'Hot tub'],
-    instantBook: true
-  };
-
-  // Trigger AI analysis when component mounts
+  // Trigger search when component mounts
   useEffect(() => {
-    analyzeProperties(searchQuery, searchResults, 'vacation_rental');
+    handleSearch();
   }, []);
 
+  const handleSearch = async () => {
+    if (searchQuery.trim()) {
+      await searchProperties(searchQuery);
+      await addSearchQuery(searchQuery);
+      analyzeProperties(searchQuery, properties.slice(0, 10), 'sale');
+    }
+  };
+
+  const handleFiltersChange = (filters: SearchFiltersType) => {
+    setAppliedFilters(filters);
+    fetchProperties(filters);
+  };
+
   const handleAIRefresh = () => {
-    analyzeProperties(searchQuery, searchResults, 'vacation_rental');
+    analyzeProperties(searchQuery, properties.slice(0, 10), 'sale');
   };
 
   const handleNewSearch = () => {
     clearInsights();
-    analyzeProperties(searchQuery, searchResults, 'vacation_rental');
+    handleSearch();
   };
 
-  const getAIRecommendationForProperty = (propertyId: number) => {
-    return aiInsights?.recommendations?.find(rec => rec.property_id === propertyId.toString());
+  const getAIRecommendationForProperty = (propertyId: string) => {
+    return aiInsights?.recommendations?.find(rec => rec.property_id === propertyId);
   };
+
+  const sortedProperties = [...properties].sort((a, b) => {
+    switch (sortBy) {
+      case 'price-low':
+        return (a.current_value || 0) - (b.current_value || 0);
+      case 'price-high':
+        return (b.current_value || 0) - (a.current_value || 0);
+      case 'newest':
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      case 'ai-recommended':
+        const aScore = getAIRecommendationForProperty(a.id)?.score || 0;
+        const bScore = getAIRecommendationForProperty(b.id)?.score || 0;
+        return bScore - aScore;
+      default:
+        return 0;
+    }
+  });
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -116,7 +96,7 @@ const SearchResults = () => {
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input
-                  placeholder="Search destinations, properties..."
+                  placeholder="Search by location, property type, or features..."
                   className="pl-10 pr-4"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
@@ -131,7 +111,7 @@ const SearchResults = () => {
             <div className="flex items-center space-x-3">
               <Button variant="outline" size="sm">
                 <Map className="w-4 h-4 mr-2" />
-                Map
+                Map View
               </Button>
             </div>
           </div>
@@ -139,10 +119,12 @@ const SearchResults = () => {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Search Summary & Filters */}
+        {/* Search Summary & Controls */}
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">{searchResults.length} stays found</h2>
+            <h2 className="text-2xl font-bold text-gray-900">
+              {propertiesLoading ? 'Searching...' : `${properties.length} properties found`}
+            </h2>
             <p className="text-gray-600">{searchQuery}</p>
           </div>
           <div className="flex items-center space-x-3">
@@ -153,16 +135,21 @@ const SearchResults = () => {
             >
               <SlidersHorizontal className="w-4 h-4" />
               <span>Filters</span>
+              {Object.keys(appliedFilters).length > 0 && (
+                <Badge variant="secondary" className="ml-1">
+                  {Object.keys(appliedFilters).length}
+                </Badge>
+              )}
             </Button>
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="px-3 py-2 border rounded-md bg-white"
             >
+              <option value="newest">Newest First</option>
               <option value="ai-recommended">AI Recommended</option>
               <option value="price-low">Price: Low to High</option>
               <option value="price-high">Price: High to Low</option>
-              <option value="rating">Highest Rated</option>
             </select>
           </div>
         </div>
@@ -171,56 +158,38 @@ const SearchResults = () => {
           {/* Filters Sidebar */}
           {showFilters && (
             <div className="w-80 flex-shrink-0">
-              <Card className="sticky top-24">
-                <CardContent className="p-6 space-y-6">
-                  <div>
-                    <h3 className="font-semibold mb-3">Price Range</h3>
-                    <Slider
-                      value={priceRange}
-                      onValueChange={setPriceRange}
-                      max={500}
-                      min={0}
-                      step={10}
-                      className="mb-2"
-                    />
-                    <div className="flex justify-between text-sm text-gray-600">
-                      <span>${priceRange[0]}</span>
-                      <span>${priceRange[1]}</span>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="font-semibold mb-3">Property Type</h3>
-                    <div className="space-y-2">
-                      {filters.propertyType.map((type) => (
-                        <div key={type} className="flex items-center space-x-2">
-                          <Checkbox id={type} />
-                          <label htmlFor={type} className="text-sm">{type}</label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="font-semibold mb-3">Amenities</h3>
-                    <div className="space-y-2">
-                      {filters.amenities.map((amenity) => (
-                        <div key={amenity} className="flex items-center space-x-2">
-                          <Checkbox id={amenity} />
-                          <label htmlFor={amenity} className="text-sm">{amenity}</label>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox id="instant" defaultChecked />
-                      <label htmlFor="instant" className="text-sm font-medium">Instant Book</label>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+              <div className="sticky top-24 space-y-4">
+                <SearchFilters
+                  onFiltersChange={handleFiltersChange}
+                  initialFilters={appliedFilters}
+                />
+                
+                {/* Recent Searches */}
+                {searchHistory.length > 0 && (
+                  <Card>
+                    <CardContent className="p-4">
+                      <h4 className="font-medium text-sm mb-3 flex items-center">
+                        <History className="w-4 h-4 mr-2" />
+                        Recent Searches
+                      </h4>
+                      <div className="space-y-2">
+                        {searchHistory.slice(0, 5).map((search) => (
+                          <button
+                            key={search.id}
+                            onClick={() => {
+                              setSearchQuery(search.search_query);
+                              handleNewSearch();
+                            }}
+                            className="text-left text-sm text-gray-600 hover:text-purple-600 block w-full truncate"
+                          >
+                            {search.search_query}
+                          </button>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             </div>
           )}
 
@@ -234,86 +203,80 @@ const SearchResults = () => {
               onRefresh={handleAIRefresh}
             />
 
-            <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-              {searchResults.map((property) => {
-                const aiRecommendation = getAIRecommendationForProperty(property.id);
-                return (
-                  <Card key={property.id} className="overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer">
-                    <div className="relative">
-                      <img
-                        src={property.image}
-                        alt={property.title}
-                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                      />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="absolute top-3 right-3 bg-white/80 backdrop-blur-sm hover:bg-white"
-                      >
-                        <Heart className="w-4 h-4" />
-                      </Button>
-                      <div className="absolute top-3 left-3 flex space-x-2">
-                        <Badge className="bg-purple-600 text-white">
-                          <Sparkles className="w-3 h-3 mr-1" />
-                          {aiRecommendation?.score || property.aiMatch}% Match
-                        </Badge>
-                        {property.instant && (
-                          <Badge variant="secondary" className="bg-green-600 text-white">
-                            Instant Book
-                          </Badge>
-                        )}
-                      </div>
+            {/* Error State */}
+            {propertiesError && (
+              <Card className="mb-6 border-red-200 bg-red-50">
+                <CardContent className="p-4">
+                  <p className="text-red-700">Error loading properties: {propertiesError}</p>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="mt-2"
+                    onClick={() => fetchProperties()}
+                  >
+                    Try Again
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Loading State */}
+            {propertiesLoading && (
+              <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => (
+                  <Card key={i} className="overflow-hidden">
+                    <div className="animate-pulse">
+                      <div className="bg-gray-200 h-48 w-full"></div>
+                      <CardContent className="p-4">
+                        <div className="space-y-3">
+                          <div className="bg-gray-200 h-4 w-3/4 rounded"></div>
+                          <div className="bg-gray-200 h-3 w-full rounded"></div>
+                          <div className="bg-gray-200 h-3 w-1/2 rounded"></div>
+                        </div>
+                      </CardContent>
                     </div>
-                    <CardContent className="p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <h3 className="font-semibold text-gray-900 line-clamp-1">{property.title}</h3>
-                        <div className="flex items-center space-x-1">
-                          <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium">{property.rating}</span>
-                        </div>
-                      </div>
-                      <p className="text-gray-600 text-sm mb-3 flex items-center">
-                        <MapPin className="w-3 h-3 mr-1" />
-                        {property.location}
-                      </p>
-                      {aiRecommendation && (
-                        <div className="bg-blue-50 rounded-lg p-2 mb-3">
-                          <p className="text-xs text-blue-700 font-medium">
-                            <Sparkles className="w-3 h-3 inline mr-1" />
-                            {aiRecommendation.reason}
-                          </p>
-                        </div>
-                      )}
-                      <div className="flex flex-wrap gap-1 mb-3">
-                        {property.tags.map((tag) => (
-                          <Badge key={tag} variant="secondary" className="text-xs">
-                            {tag}
-                          </Badge>
-                        ))}
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="text-lg font-bold text-gray-900">${property.price}</span>
-                          <span className="text-gray-600 text-sm"> / night</span>
-                        </div>
-                        <Link to={`/property/${property.id}`}>
-                          <Button size="sm" className="gradient-ai text-white">
-                            View Details
-                          </Button>
-                        </Link>
-                      </div>
-                    </CardContent>
                   </Card>
-                );
-              })}
-            </div>
+                ))}
+              </div>
+            )}
+
+            {/* Properties Grid */}
+            {!propertiesLoading && sortedProperties.length > 0 && (
+              <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+                {sortedProperties.map((property) => (
+                  <PropertyCard
+                    key={property.id}
+                    property={property}
+                    showMarketData={true}
+                  />
+                ))}
+              </div>
+            )}
+
+            {/* Empty State */}
+            {!propertiesLoading && !propertiesError && sortedProperties.length === 0 && (
+              <Card className="text-center py-12">
+                <CardContent>
+                  <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No properties found</h3>
+                  <p className="text-gray-600 mb-4">
+                    Try adjusting your search criteria or filters to find more properties.
+                  </p>
+                  <Button onClick={() => setAppliedFilters({})}>
+                    Clear Filters
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Load More */}
-            <div className="text-center mt-8">
-              <Button variant="outline" size="lg">
-                Load More Results
-              </Button>
-            </div>
+            {!propertiesLoading && sortedProperties.length > 0 && (
+              <div className="text-center mt-8">
+                <Button variant="outline" size="lg">
+                  Load More Properties
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </div>
