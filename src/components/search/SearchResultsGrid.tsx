@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { MapPin } from 'lucide-react';
+import { MapPin, Loader2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/PropertyCard';
@@ -17,6 +17,9 @@ interface SearchResultsGridProps {
   onRefresh: () => void;
   onAIRefresh: () => void;
   onClearFilters: () => void;
+  onLoadMore?: () => void;
+  isLoadingMore?: boolean;
+  hasMoreProperties?: boolean;
 }
 
 export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
@@ -28,7 +31,10 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
   aiError,
   onRefresh,
   onAIRefresh,
-  onClearFilters
+  onClearFilters,
+  onLoadMore,
+  isLoadingMore = false,
+  hasMoreProperties = false
 }) => {
   return (
     <div className="flex-1">
@@ -99,18 +105,41 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
             <p className="text-gray-600 mb-4">
               Try adjusting your search criteria or filters to find more properties.
             </p>
-            <Button onClick={onClearFilters}>
-              Clear Filters
-            </Button>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center">
+              <Button onClick={onClearFilters}>
+                Clear Filters
+              </Button>
+              <Button variant="outline" onClick={() => window.location.href = '/search?q=luxury+homes'}>
+                Search Luxury Homes
+              </Button>
+              <Button variant="outline" onClick={() => window.location.href = '/search?q=mountain+cabins'}>
+                Search Mountain Cabins
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
 
       {/* Load More */}
-      {!isLoading && properties.length > 0 && (
+      {!isLoading && properties.length > 0 && onLoadMore && (
         <div className="text-center mt-8">
-          <Button variant="outline" size="lg">
-            Load More Properties
+          <Button 
+            variant="outline" 
+            size="lg"
+            onClick={onLoadMore}
+            disabled={isLoadingMore || !hasMoreProperties}
+            className="min-w-[200px]"
+          >
+            {isLoadingMore ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Loading More...
+              </>
+            ) : hasMoreProperties ? (
+              'Load More Properties'
+            ) : (
+              'No More Properties'
+            )}
           </Button>
         </div>
       )}

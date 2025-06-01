@@ -16,6 +16,16 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
   onSearchQueryChange,
   onSearch
 }) => {
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      onSearch();
+      // Update URL with search query
+      const searchParams = new URLSearchParams();
+      searchParams.set('q', searchQuery);
+      window.history.pushState({}, '', `/search?${searchParams.toString()}`);
+    }
+  };
+
   return (
     <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -36,18 +46,17 @@ export const SearchHeader: React.FC<SearchHeaderProps> = ({
                 className="pl-10 pr-4"
                 value={searchQuery}
                 onChange={(e) => onSearchQueryChange(e.target.value)}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter') {
-                    onSearch();
-                  }
-                }}
+                onKeyPress={handleKeyPress}
               />
             </div>
           </div>
           <div className="flex items-center space-x-3">
-            <Button variant="outline" size="sm">
-              <Map className="w-4 h-4 mr-2" />
-              Map View
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => window.location.href = '/search?q=luxury+homes'}
+            >
+              Quick Search: Luxury
             </Button>
           </div>
         </div>

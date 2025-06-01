@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, Map } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SearchFilters as SearchFiltersType } from '@/components/SearchFilters';
@@ -14,6 +14,8 @@ interface SearchControlsProps {
   appliedFilters: SearchFiltersType;
   sortBy: string;
   onSortChange: (sortBy: string) => void;
+  showMap?: boolean;
+  onToggleMap?: () => void;
 }
 
 export const SearchControls: React.FC<SearchControlsProps> = ({
@@ -24,7 +26,9 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
   onToggleFilters,
   appliedFilters,
   sortBy,
-  onSortChange
+  onSortChange,
+  showMap = false,
+  onToggleMap
 }) => {
   return (
     <div className="flex items-center justify-between mb-6">
@@ -48,6 +52,18 @@ export const SearchControls: React.FC<SearchControlsProps> = ({
             </Badge>
           )}
         </Button>
+        
+        {onToggleMap && (
+          <Button
+            variant={showMap ? "default" : "outline"}
+            onClick={onToggleMap}
+            className="flex items-center space-x-2"
+          >
+            <Map className="w-4 h-4" />
+            <span>{showMap ? 'List View' : 'Map View'}</span>
+          </Button>
+        )}
+        
         <select
           value={sortBy}
           onChange={(e) => onSortChange(e.target.value)}
