@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tables } from '@/integrations/supabase/types';
@@ -174,6 +173,23 @@ const getSampleProperties = (searchQuery: string): EnhancedProperty[] => {
   return baseProperties;
 };
 
+// Helper function to check if a string is a valid UUID
+const isValidUUID = (str: string) => {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+};
+
+// Helper function to map simple IDs to sample property IDs
+const mapToSampleId = (id: string): string => {
+  const idMappings: Record<string, string> = {
+    '1': 'sample-1',
+    '2': 'sample-2', 
+    '3': 'sample-3'
+  };
+  
+  return idMappings[id] || id;
+};
+
 export const usePropertyData = () => {
   const [properties, setProperties] = useState<EnhancedProperty[]>([]);
   const [loading, setLoading] = useState(true);
@@ -297,28 +313,44 @@ export const usePropertyData = () => {
   };
 
   const getPropertyById = async (id: string): Promise<EnhancedProperty | null> => {
+    console.log('getPropertyById called with ID:', id);
+    
     try {
-      const { data, error } = await supabase
-        .from('properties')
-        .select(`
-          *,
-          property_photos(*),
-          property_features(*),
-          neighborhoods(*),
-          property_market_data(*)
-        `)
-        .eq('id', id)
-        .single();
+      // Only try Supabase query if the ID is a valid UUID
+      if (isValidUUID(id)) {
+        console.log('ID is valid UUID, querying Supabase...');
+        const { data, error } = await supabase
+          .from('properties')
+          .select(`
+            *,
+            property_photos(*),
+            property_features(*),
+            neighborhoods(*),
+            property_market_data(*)
+          `)
+          .eq('id', id)
+          .single();
 
-      if (error) throw error;
-      return data;
+        if (error) throw error;
+        console.log('Found property in Supabase:', data);
+        return data;
+      } else {
+        console.log('ID is not UUID, skipping Supabase query');
+      }
     } catch (err) {
-      console.error('Error fetching property:', err);
-      
-      // Check if it's a sample property
-      const sampleData = getSampleProperties('');
-      return sampleData.find(p => p.id === id) || null;
+      console.error('Error fetching property from Supabase:', err);
     }
+    
+    // Always check sample data as fallback
+    console.log('Checking sample data...');
+    const sampleData = getSampleProperties('');
+    const mappedId = mapToSampleId(id);
+    console.log('Original ID:', id, 'Mapped ID:', mappedId);
+    
+    const foundProperty = sampleData.find(p => p.id === mappedId);
+    console.log('Found sample property:', foundProperty);
+    
+    return foundProperty || null;
   };
 
   useEffect(() => {
