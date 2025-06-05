@@ -39,11 +39,6 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
 }) => {
   const navigate = useNavigate();
 
-  const handlePropertyClick = (propertyId: string) => {
-    console.log('Navigating to property:', propertyId);
-    navigate(`/property/${propertyId}`);
-  };
-
   return (
     <div className="flex-1">
       {/* AI Insights Banner */}
@@ -99,9 +94,6 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
               key={property.id}
               property={property}
               showMarketData={true}
-              onViewDetails={() => handlePropertyClick(property.id)}
-              onSaveProperty={(id) => console.log('Saving property:', id)}
-              onShareProperty={(id) => console.log('Sharing property:', id)}
             />
           ))}
         </div>
