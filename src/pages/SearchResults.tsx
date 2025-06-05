@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { usePropertyAI } from '@/hooks/usePropertyAI';
@@ -9,6 +10,10 @@ import { SearchControls } from '@/components/search/SearchControls';
 import { SearchSidebar } from '@/components/search/SearchSidebar';
 import { SearchResultsGrid } from '@/components/search/SearchResultsGrid';
 import { MapView } from '@/components/search/MapView';
+import { AIAssistant } from '@/components/AIAssistant';
+import { AIRecommendations } from '@/components/AIRecommendations';
+import { AIPropertyComparison } from '@/components/AIPropertyComparison';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const SearchResults = () => {
   const location = useLocation();
@@ -22,6 +27,7 @@ const SearchResults = () => {
   const [appliedFilters, setAppliedFilters] = useState<SearchFiltersType>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [activeTab, setActiveTab] = useState('results');
   
   const { 
     properties, 
@@ -51,10 +57,8 @@ const SearchResults = () => {
   const handleLoadMore = async () => {
     setIsLoadingMore(true);
     try {
-      // Simulate loading more properties with pagination
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      // For demo purposes, we'll search for related terms when loading more
       const moreSearchTerms = [
         'luxury homes', 'condos', 'townhouses', 'waterfront properties',
         'ski properties', 'mountain homes', 'downtown lofts', 'family homes'
@@ -134,40 +138,74 @@ const SearchResults = () => {
           onToggleMap={() => setShowMap(!showMap)}
         />
 
-        {showMap ? (
-          <MapView
-            properties={sortedProperties}
-            onPropertySelect={(property) => console.log('Selected property:', property)}
-            isLoading={propertiesLoading}
-          />
-        ) : (
-          <div className="flex gap-8">
-            {showFilters && (
-              <SearchSidebar
-                onFiltersChange={handleFiltersChange}
-                appliedFilters={appliedFilters}
-                searchHistory={searchHistory}
-                onHistoryItemClick={handleHistoryItemClick}
-              />
-            )}
+        {/* Enhanced AI-powered tabs */}
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="results">Property Results</TabsTrigger>
+            <TabsTrigger value="ai-insights">AI Insights</TabsTrigger>
+            <TabsTrigger value="comparison">AI Compare</TabsTrigger>
+            <TabsTrigger value="map">Map View</TabsTrigger>
+          </TabsList>
 
-            <SearchResultsGrid
+          <TabsContent value="results">
+            {showMap ? (
+              <MapView
+                properties={sortedProperties}
+                onPropertySelect={(property) => console.log('Selected property:', property)}
+                isLoading={propertiesLoading}
+              />
+            ) : (
+              <div className="flex gap-8">
+                {showFilters && (
+                  <SearchSidebar
+                    onFiltersChange={handleFiltersChange}
+                    appliedFilters={appliedFilters}
+                    searchHistory={searchHistory}
+                    onHistoryItemClick={handleHistoryItemClick}
+                  />
+                )}
+
+                <SearchResultsGrid
+                  properties={sortedProperties}
+                  isLoading={propertiesLoading}
+                  error={propertiesError}
+                  aiInsights={aiInsights}
+                  aiLoading={aiLoading}
+                  aiError={aiError}
+                  onRefresh={() => fetchProperties()}
+                  onAIRefresh={handleAIRefresh}
+                  onClearFilters={() => setAppliedFilters({})}
+                  onLoadMore={handleLoadMore}
+                  isLoadingMore={isLoadingMore}
+                  hasMoreProperties={currentPage < 5}
+                />
+              </div>
+            )}
+          </TabsContent>
+
+          <TabsContent value="ai-insights">
+            <AIRecommendations searchQuery={searchQuery} />
+          </TabsContent>
+
+          <TabsContent value="comparison">
+            <AIPropertyComparison 
               properties={sortedProperties}
-              isLoading={propertiesLoading}
-              error={propertiesError}
-              aiInsights={aiInsights}
-              aiLoading={aiLoading}
-              aiError={aiError}
-              onRefresh={() => fetchProperties()}
-              onAIRefresh={handleAIRefresh}
-              onClearFilters={() => setAppliedFilters({})}
-              onLoadMore={handleLoadMore}
-              isLoadingMore={isLoadingMore}
-              hasMoreProperties={currentPage < 5}
+              onSelectProperty={(property) => window.location.href = `/property/${property.id}`}
             />
-          </div>
-        )}
+          </TabsContent>
+
+          <TabsContent value="map">
+            <MapView
+              properties={sortedProperties}
+              onPropertySelect={(property) => console.log('Selected property:', property)}
+              isLoading={propertiesLoading}
+            />
+          </TabsContent>
+        </Tabs>
       </div>
+
+      {/* AI Assistant - available on all pages */}
+      <AIAssistant />
     </div>
   );
 };

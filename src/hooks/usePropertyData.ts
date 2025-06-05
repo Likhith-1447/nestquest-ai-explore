@@ -1,3 +1,6 @@
 
-// Re-export from the refactored module for backward compatibility
-export { usePropertyData, type EnhancedProperty } from './usePropertyData';
+// Main usePropertyData hook export
+export { usePropertyData } from './usePropertyData/usePropertyData';
+export type { EnhancedProperty } from './usePropertyData/types';
+export { getSampleProperties } from './usePropertyData/sampleData';
+export { isValidUUID, mapToSampleId } from './usePropertyData/utils';
