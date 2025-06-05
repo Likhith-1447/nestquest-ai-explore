@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { usePropertyAI } from '@/hooks/usePropertyAI';
 import { usePropertyData } from '@/hooks/usePropertyData';
+import { useNavigate } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -16,6 +17,7 @@ interface Message {
 }
 
 export const AIAssistant: React.FC = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
@@ -56,6 +58,14 @@ export const AIAssistant: React.FC = () => {
     };
 
     setMessages(prev => [...prev, aiResponse]);
+  };
+
+  const handleSuggestedQuestion = (question: string) => {
+    setInputMessage(question);
+    // Auto-navigate to search for certain questions
+    if (question.includes('under $500k') || question.includes('properties')) {
+      navigate('/search?q=' + encodeURIComponent(question));
+    }
   };
 
   const suggestedQuestions = [
@@ -157,7 +167,7 @@ export const AIAssistant: React.FC = () => {
                       variant="ghost"
                       size="sm"
                       className="w-full justify-start text-left h-auto py-2 px-3 text-xs"
-                      onClick={() => setInputMessage(question)}
+                      onClick={() => handleSuggestedQuestion(question)}
                     >
                       <Sparkles className="w-3 h-3 mr-2 flex-shrink-0" />
                       {question}

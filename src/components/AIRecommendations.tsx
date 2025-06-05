@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { usePropertyAI } from '@/hooks/usePropertyAI';
 import { usePropertyData } from '@/hooks/usePropertyData';
+import { useNavigate } from 'react-router-dom';
 
 interface AIRecommendationsProps {
   searchQuery?: string;
@@ -16,6 +17,7 @@ export const AIRecommendations: React.FC<AIRecommendationsProps> = ({
   searchQuery = '',
   className = ''
 }) => {
+  const navigate = useNavigate();
   const { analyzeProperties, aiInsights, isLoading } = usePropertyAI();
   const { properties } = usePropertyData();
   const [hasAnalyzed, setHasAnalyzed] = useState(false);
@@ -30,6 +32,11 @@ export const AIRecommendations: React.FC<AIRecommendationsProps> = ({
   const recommendations = aiInsights?.recommendations || [];
   const marketAnalysis = aiInsights?.market_analysis || '';
   const searchTips = aiInsights?.search_tips || '';
+
+  const handleViewProperty = (propertyId: string) => {
+    console.log('Navigating to property from AI recommendations:', propertyId);
+    navigate(`/property/${propertyId}`);
+  };
 
   return (
     <div className={`space-y-6 ${className}`}>
@@ -127,7 +134,7 @@ export const AIRecommendations: React.FC<AIRecommendationsProps> = ({
                       variant="outline"
                       size="sm"
                       className="mt-3 text-purple-600 border-purple-300 hover:bg-purple-50"
-                      onClick={() => window.location.href = `/property/${property.id}`}
+                      onClick={() => handleViewProperty(property.id)}
                     >
                       View Details
                     </Button>

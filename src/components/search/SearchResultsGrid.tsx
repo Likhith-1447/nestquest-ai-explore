@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { PropertyCard } from '@/components/PropertyCard';
 import { AIInsightsBanner } from '@/components/AIInsightsBanner';
 import { EnhancedProperty } from '@/hooks/usePropertyData';
+import { useNavigate } from 'react-router-dom';
 
 interface SearchResultsGridProps {
   properties: EnhancedProperty[];
@@ -36,6 +37,13 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
   isLoadingMore = false,
   hasMoreProperties = false
 }) => {
+  const navigate = useNavigate();
+
+  const handlePropertyClick = (propertyId: string) => {
+    console.log('Navigating to property:', propertyId);
+    navigate(`/property/${propertyId}`);
+  };
+
   return (
     <div className="flex-1">
       {/* AI Insights Banner */}
@@ -91,6 +99,9 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
               key={property.id}
               property={property}
               showMarketData={true}
+              onViewDetails={() => handlePropertyClick(property.id)}
+              onSaveProperty={(id) => console.log('Saving property:', id)}
+              onShareProperty={(id) => console.log('Sharing property:', id)}
             />
           ))}
         </div>
@@ -109,10 +120,10 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
               <Button onClick={onClearFilters}>
                 Clear Filters
               </Button>
-              <Button variant="outline" onClick={() => window.location.href = '/search?q=luxury+homes'}>
+              <Button variant="outline" onClick={() => navigate('/search?q=luxury+homes')}>
                 Search Luxury Homes
               </Button>
-              <Button variant="outline" onClick={() => window.location.href = '/search?q=mountain+cabins'}>
+              <Button variant="outline" onClick={() => navigate('/search?q=mountain+cabins')}>
                 Search Mountain Cabins
               </Button>
             </div>
