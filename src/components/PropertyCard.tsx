@@ -64,7 +64,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   const features = getPropertyFeatures();
 
   return (
-    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer">
+    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
       <div className="relative">
         <img
           src={primaryPhoto?.photo_url || "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=400&h=300&fit=crop"}
