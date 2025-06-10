@@ -19,18 +19,33 @@ const PropertyDetails = () => {
   const [isLiked, setIsLiked] = useState(false);
 
   useEffect(() => {
+    console.log('PropertyDetails mounted with ID:', id);
+    
     const fetchProperty = async () => {
       if (id) {
+        console.log('Fetching property with ID:', id);
         setLoading(true);
-        const propertyData = await getPropertyById(id);
-        setProperty(propertyData);
+        try {
+          const propertyData = await getPropertyById(id);
+          console.log('Property data received:', propertyData);
+          setProperty(propertyData);
+        } catch (error) {
+          console.error('Error fetching property:', error);
+          setProperty(null);
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        console.log('No ID provided');
         setLoading(false);
       }
     };
+    
     fetchProperty();
   }, [id, getPropertyById]);
 
   if (loading) {
+    console.log('PropertyDetails: Loading state');
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
         <div className="animate-pulse text-center">
@@ -42,6 +57,7 @@ const PropertyDetails = () => {
   }
 
   if (!property) {
+    console.log('PropertyDetails: No property found');
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center animate-fade-in">
@@ -54,6 +70,8 @@ const PropertyDetails = () => {
       </div>
     );
   }
+
+  console.log('PropertyDetails: Rendering property:', property.id);
 
   const images = property.property_photos?.map(photo => photo.photo_url) || [
     "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop"

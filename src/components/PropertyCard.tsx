@@ -30,52 +30,51 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
     }).format(price);
   };
 
-  const handleViewDetails = () => {
+  const handleViewDetails = (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     console.log('Navigating to property:', property.id);
     navigate(`/property/${property.id}`);
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer">
-      <div onClick={handleViewDetails}>
-        <PropertyCardImage
+    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
+      <PropertyCardImage
+        property={property}
+        showMarketData={showMarketData}
+        formatPrice={formatPrice}
+      />
+
+      <CardContent className="p-4">
+        <PropertyCardDetails
           property={property}
-          showMarketData={showMarketData}
           formatPrice={formatPrice}
         />
 
-        <CardContent className="p-4">
-          <PropertyCardDetails
-            property={property}
-            formatPrice={formatPrice}
-          />
+        <PropertyCardFeatures property={property} />
 
-          <PropertyCardFeatures property={property} />
+        <PropertyCardMarketData
+          property={property}
+          showMarketData={showMarketData}
+        />
 
-          <PropertyCardMarketData
-            property={property}
-            showMarketData={showMarketData}
-          />
-
-          <div className="flex items-center justify-between">
-            <div className="text-xs text-gray-500">
-              {property.property_type && (
-                <span className="capitalize">{property.property_type}</span>
-              )}
-            </div>
-            <Button 
-              size="sm" 
-              className="gradient-ai text-white"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleViewDetails();
-              }}
-            >
-              View Details
-            </Button>
+        <div className="flex items-center justify-between">
+          <div className="text-xs text-gray-500">
+            {property.property_type && (
+              <span className="capitalize">{property.property_type}</span>
+            )}
           </div>
-        </CardContent>
-      </div>
+          <Button 
+            size="sm" 
+            className="gradient-ai text-white"
+            onClick={handleViewDetails}
+          >
+            View Details
+          </Button>
+        </div>
+      </CardContent>
     </Card>
   );
 };
