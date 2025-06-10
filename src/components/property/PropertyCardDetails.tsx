@@ -1,7 +1,5 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
 import { MapPin, Bed, Bath, Square, Calendar } from 'lucide-react';
 import { EnhancedProperty } from '@/hooks/usePropertyData';
 

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { EnhancedProperty } from '@/hooks/usePropertyData';
@@ -18,6 +18,8 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   property, 
   showMarketData = false 
 }) => {
+  const navigate = useNavigate();
+
   const formatPrice = (price: number | null) => {
     if (!price) return 'Price on request';
     return new Intl.NumberFormat('en-US', {
@@ -28,40 +30,52 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
     }).format(price);
   };
 
-  return (
-    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
-      <PropertyCardImage
-        property={property}
-        showMarketData={showMarketData}
-        formatPrice={formatPrice}
-      />
+  const handleViewDetails = () => {
+    console.log('Navigating to property:', property.id);
+    navigate(`/property/${property.id}`);
+  };
 
-      <CardContent className="p-4">
-        <PropertyCardDetails
+  return (
+    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group cursor-pointer">
+      <div onClick={handleViewDetails}>
+        <PropertyCardImage
           property={property}
+          showMarketData={showMarketData}
           formatPrice={formatPrice}
         />
 
-        <PropertyCardFeatures property={property} />
+        <CardContent className="p-4">
+          <PropertyCardDetails
+            property={property}
+            formatPrice={formatPrice}
+          />
 
-        <PropertyCardMarketData
-          property={property}
-          showMarketData={showMarketData}
-        />
+          <PropertyCardFeatures property={property} />
 
-        <div className="flex items-center justify-between">
-          <div className="text-xs text-gray-500">
-            {property.property_type && (
-              <span className="capitalize">{property.property_type}</span>
-            )}
-          </div>
-          <Link to={`/property/${property.id}`}>
-            <Button size="sm" className="gradient-ai text-white">
+          <PropertyCardMarketData
+            property={property}
+            showMarketData={showMarketData}
+          />
+
+          <div className="flex items-center justify-between">
+            <div className="text-xs text-gray-500">
+              {property.property_type && (
+                <span className="capitalize">{property.property_type}</span>
+              )}
+            </div>
+            <Button 
+              size="sm" 
+              className="gradient-ai text-white"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleViewDetails();
+              }}
+            >
               View Details
             </Button>
-          </Link>
-        </div>
-      </CardContent>
+          </div>
+        </CardContent>
+      </div>
     </Card>
   );
 };

@@ -39,6 +39,10 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
 }) => {
   const navigate = useNavigate();
 
+  const handleQuickSearch = (query: string) => {
+    navigate(`/search?q=${encodeURIComponent(query)}`);
+  };
+
   return (
     <div className="flex-1">
       {/* AI Insights Banner */}
@@ -112,10 +116,10 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
               <Button onClick={onClearFilters}>
                 Clear Filters
               </Button>
-              <Button variant="outline" onClick={() => navigate('/search?q=luxury+homes')}>
+              <Button variant="outline" onClick={() => handleQuickSearch('luxury homes')}>
                 Search Luxury Homes
               </Button>
-              <Button variant="outline" onClick={() => navigate('/search?q=mountain+cabins')}>
+              <Button variant="outline" onClick={() => handleQuickSearch('mountain cabins')}>
                 Search Mountain Cabins
               </Button>
             </div>
