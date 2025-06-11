@@ -35,8 +35,20 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
       e.preventDefault();
       e.stopPropagation();
     }
-    console.log('Navigating to property:', property.id);
-    navigate(`/property/${property.id}`);
+    
+    // Ensure we have a valid property ID
+    const propertyId = property.id || 'sample-1';
+    console.log('PropertyCard: Navigating to property ID:', propertyId);
+    console.log('PropertyCard: Full property object:', property);
+    
+    // Navigate with proper error handling
+    try {
+      navigate(`/property/${propertyId}`);
+    } catch (error) {
+      console.error('Navigation error:', error);
+      // Fallback navigation
+      window.location.href = `/property/${propertyId}`;
+    }
   };
 
   return (
@@ -68,7 +80,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
           </div>
           <Button 
             size="sm" 
-            className="gradient-ai text-white"
+            className="gradient-ai text-white hover:scale-105 transition-transform"
             onClick={handleViewDetails}
           >
             View Details
