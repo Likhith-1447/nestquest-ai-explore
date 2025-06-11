@@ -36,30 +36,26 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
       e.stopPropagation();
     }
     
-    // Ensure we have a valid property ID
-    const propertyId = property.id || 'sample-1';
+    const propertyId = property.id;
     console.log('PropertyCard: Navigating to property ID:', propertyId);
-    console.log('PropertyCard: Full property object:', property);
     
-    // Navigate with proper error handling
     try {
       navigate(`/property/${propertyId}`);
     } catch (error) {
       console.error('Navigation error:', error);
-      // Fallback navigation
       window.location.href = `/property/${propertyId}`;
     }
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group">
+    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group w-full max-w-sm mx-auto sm:max-w-none">
       <PropertyCardImage
         property={property}
         showMarketData={showMarketData}
         formatPrice={formatPrice}
       />
 
-      <CardContent className="p-4">
+      <CardContent className="p-3 sm:p-4 lg:p-6">
         <PropertyCardDetails
           property={property}
           formatPrice={formatPrice}
@@ -72,15 +68,15 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
           showMarketData={showMarketData}
         />
 
-        <div className="flex items-center justify-between">
-          <div className="text-xs text-gray-500">
+        <div className="flex items-center justify-between mt-4">
+          <div className="text-xs text-gray-500 hidden sm:block">
             {property.property_type && (
               <span className="capitalize">{property.property_type}</span>
             )}
           </div>
           <Button 
             size="sm" 
-            className="gradient-ai text-white hover:scale-105 transition-transform"
+            className="gradient-ai text-white hover:scale-105 transition-transform w-full sm:w-auto"
             onClick={handleViewDetails}
           >
             View Details

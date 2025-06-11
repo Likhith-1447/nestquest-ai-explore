@@ -44,7 +44,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
   };
 
   return (
-    <div className="flex-1">
+    <div className="flex-1 w-full">
       {/* AI Insights Banner */}
       <AIInsightsBanner
         insights={aiInsights}
@@ -57,7 +57,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
       {error && (
         <Card className="mb-6 border-red-200 bg-red-50">
           <CardContent className="p-4">
-            <p className="text-red-700">Error loading properties: {error}</p>
+            <p className="text-red-700 text-sm sm:text-base">Error loading properties: {error}</p>
             <Button 
               variant="outline" 
               size="sm" 
@@ -72,12 +72,12 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
 
       {/* Loading State */}
       {isLoading && (
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-          {[...Array(6)].map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+          {[...Array(8)].map((_, i) => (
             <Card key={i} className="overflow-hidden">
               <div className="animate-pulse">
-                <div className="bg-gray-200 h-48 w-full"></div>
-                <CardContent className="p-4">
+                <div className="bg-gray-200 h-40 sm:h-48 w-full"></div>
+                <CardContent className="p-3 sm:p-4">
                   <div className="space-y-3">
                     <div className="bg-gray-200 h-4 w-3/4 rounded"></div>
                     <div className="bg-gray-200 h-3 w-full rounded"></div>
@@ -92,7 +92,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
 
       {/* Properties Grid */}
       {!isLoading && properties.length > 0 && (
-        <div className="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {properties.map((property) => (
             <PropertyCard
               key={property.id}
@@ -105,21 +105,21 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
 
       {/* Empty State */}
       {!isLoading && !error && properties.length === 0 && (
-        <Card className="text-center py-12">
-          <CardContent>
+        <Card className="text-center py-8 sm:py-12 mx-4 sm:mx-0">
+          <CardContent className="px-4 sm:px-6">
             <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 mb-2">No properties found</h3>
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 mb-4 text-sm sm:text-base">
               Try adjusting your search criteria or filters to find more properties.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Button onClick={onClearFilters}>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+              <Button onClick={onClearFilters} className="w-full sm:w-auto">
                 Clear Filters
               </Button>
-              <Button variant="outline" onClick={() => handleQuickSearch('luxury homes')}>
+              <Button variant="outline" onClick={() => handleQuickSearch('luxury homes')} className="w-full sm:w-auto">
                 Search Luxury Homes
               </Button>
-              <Button variant="outline" onClick={() => handleQuickSearch('mountain cabins')}>
+              <Button variant="outline" onClick={() => handleQuickSearch('mountain cabins')} className="w-full sm:w-auto">
                 Search Mountain Cabins
               </Button>
             </div>
@@ -135,7 +135,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
             size="lg"
             onClick={onLoadMore}
             disabled={isLoadingMore || !hasMoreProperties}
-            className="min-w-[200px]"
+            className="min-w-[200px] w-full sm:w-auto"
           >
             {isLoadingMore ? (
               <>
