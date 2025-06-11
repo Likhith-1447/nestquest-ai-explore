@@ -4,6 +4,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Heart, Share2, MapPin, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePropertyData, EnhancedProperty } from '@/hooks/usePropertyData';
+import { PropertyImageGallery } from '@/components/property/PropertyImageGallery';
+import { PropertyInfoCard } from '@/components/property/PropertyInfoCard';
 
 const PropertyDetails = () => {
   const { id } = useParams();
@@ -13,6 +15,7 @@ const PropertyDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
     console.log('PropertyDetails: Component mounted');
@@ -57,9 +60,9 @@ const PropertyDetails = () => {
     console.log('PropertyDetails: Rendering loading state');
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
-        <div className="animate-pulse text-center">
-          <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full mx-auto mb-4 animate-scale-in"></div>
-          <p className="text-gray-600">Loading property details...</p>
+        <div className="text-center">
+          <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full mx-auto mb-4 animate-pulse"></div>
+          <p className="text-gray-600 animate-fade-in">Loading property details...</p>
           <p className="text-sm text-gray-500 mt-2">Property ID: {id}</p>
         </div>
       </div>
@@ -103,23 +106,27 @@ const PropertyDetails = () => {
     }).format(price);
   };
 
+  const propertyImages = property.property_photos?.map(photo => photo.photo_url) || [
+    "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop"
+  ];
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b shadow-sm">
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             <div className="flex items-center space-x-4">
               <Button 
                 variant="ghost" 
                 onClick={() => navigate('/search')} 
-                className="flex items-center space-x-2 hover:opacity-80 transition-all duration-200 hover:scale-105"
+                className="flex items-center space-x-2 hover:bg-gray-100 transition-colors duration-200"
               >
                 <ArrowLeft className="w-5 h-5" />
                 <span>Back to search</span>
               </Button>
               <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 gradient-ai rounded-lg flex items-center justify-center animate-scale-in">
+                <div className="w-8 h-8 gradient-ai rounded-lg flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
@@ -128,7 +135,7 @@ const PropertyDetails = () => {
               </div>
             </div>
             <div className="flex items-center space-x-3">
-              <Button variant="ghost" size="sm" className="hover-scale">
+              <Button variant="ghost" size="sm" className="hover:bg-gray-100 transition-colors duration-200">
                 <Share2 className="w-4 h-4 mr-2" />
                 Share
               </Button>
@@ -136,7 +143,7 @@ const PropertyDetails = () => {
                 variant="ghost" 
                 size="sm" 
                 onClick={() => setIsLiked(!isLiked)}
-                className={`hover-scale transition-colors duration-200 ${isLiked ? 'text-red-500' : ''}`}
+                className={`transition-all duration-200 hover:bg-gray-100 ${isLiked ? 'text-red-500' : ''}`}
               >
                 <Heart className={`w-4 h-4 mr-2 transition-all duration-200 ${isLiked ? 'fill-red-500' : ''}`} />
                 {isLiked ? 'Saved' : 'Save'}
@@ -146,56 +153,80 @@ const PropertyDetails = () => {
         </div>
       </header>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Simplified Property Content */}
-        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-          {/* Basic Property Image */}
-          <div className="relative h-96">
-            <img 
-              src={property.property_photos?.[0]?.photo_url || "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop"}
-              alt={property.address}
-              className="w-full h-full object-cover"
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden animate-fade-in">
+          {/* Property Image Gallery */}
+          <div className="mb-8">
+            <PropertyImageGallery 
+              images={propertyImages}
+              address={property.address || 'Property'}
             />
           </div>
 
-          {/* Basic Property Info */}
-          <div className="p-8">
-            <div className="mb-6">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">{property.address}</h1>
-              <p className="text-gray-600 flex items-center text-lg">
-                <MapPin className="w-5 h-5 mr-2" />
+          {/* Property Content */}
+          <div className="p-6 lg:p-8">
+            {/* Property Header */}
+            <div className="mb-8 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-3">{property.address}</h1>
+              <p className="text-gray-600 flex items-center text-lg mb-4">
+                <MapPin className="w-5 h-5 mr-2 text-purple-600" />
                 {property.city}, {property.state} {property.zip_code}
               </p>
+              
+              <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+                <div>
+                  <span className="text-4xl lg:text-5xl font-bold text-purple-600">
+                    {formatPrice(property.current_value)}
+                  </span>
+                  {property.listing_type && (
+                    <span className="text-gray-600 ml-3 text-lg">
+                      for {property.listing_type}
+                    </span>
+                  )}
+                </div>
+                
+                {property.property_type && (
+                  <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-medium bg-purple-100 text-purple-800 capitalize">
+                    {property.property_type}
+                  </span>
+                )}
+              </div>
             </div>
 
-            <div className="mb-6">
-              <span className="text-4xl font-bold text-purple-600">
-                {formatPrice(property.current_value)}
-              </span>
-              {property.listing_type && (
-                <span className="text-gray-600 ml-2">
-                  for {property.listing_type}
-                </span>
-              )}
+            {/* Property Info Cards */}
+            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <PropertyInfoCard property={property} />
             </div>
 
-            <div className="flex flex-wrap gap-6 text-gray-600">
-              {property.bedrooms && (
-                <span>{property.bedrooms} bedrooms</span>
-              )}
-              {property.bathrooms && (
-                <span>{property.bathrooms} bathrooms</span>
-              )}
-              {property.square_feet && (
-                <span>{property.square_feet.toLocaleString()} sq ft</span>
-              )}
-              {property.year_built && (
-                <span>Built in {property.year_built}</span>
-              )}
-            </div>
+            {/* Property Features */}
+            {property.property_features && property.property_features.length > 0 && (
+              <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+                <h3 className="text-xl font-semibold mb-4">Features</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+                  {property.property_features.map((feature) => (
+                    <div key={feature.id} className="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors duration-200">
+                      <h4 className="font-medium text-gray-900">{feature.feature_name}</h4>
+                      {feature.feature_description && (
+                        <p className="text-sm text-gray-600 mt-1">{feature.feature_description}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
-            <div className="mt-8 text-center">
-              <p className="text-gray-500">More details coming soon...</p>
+            {/* Contact CTA */}
+            <div className="text-center bg-gradient-to-r from-purple-50 to-blue-50 rounded-xl p-8 animate-fade-in" style={{ animationDelay: '0.4s' }}>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">Interested in this property?</h3>
+              <p className="text-gray-600 mb-6">Get in touch with our expert agents for more details and scheduling a viewing.</p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button className="gradient-ai text-white hover:scale-105 transition-transform duration-200">
+                  Schedule Viewing
+                </Button>
+                <Button variant="outline" className="hover:bg-gray-50 transition-colors duration-200">
+                  Contact Agent
+                </Button>
+              </div>
             </div>
           </div>
         </div>
