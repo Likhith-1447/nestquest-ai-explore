@@ -1,15 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Heart, Share2, Star, MapPin, Sparkles } from 'lucide-react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { ArrowLeft, Heart, Share2, MapPin, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { usePropertyData, EnhancedProperty } from '@/hooks/usePropertyData';
-import { PropertyImageGallery } from '@/components/property/PropertyImageGallery';
-import { PropertyInfoCard } from '@/components/property/PropertyInfoCard';
-import { PropertyAIInsights } from '@/components/property/PropertyAIInsights';
-import { PropertyAmenities } from '@/components/property/PropertyAmenities';
-import { PropertyHostInfo } from '@/components/property/PropertyHostInfo';
-import { PropertyBookingSidebar } from '@/components/property/PropertyBookingSidebar';
 
 const PropertyDetails = () => {
   const { id } = useParams();
@@ -23,7 +17,6 @@ const PropertyDetails = () => {
   useEffect(() => {
     console.log('PropertyDetails: Component mounted');
     console.log('PropertyDetails: URL params ID:', id);
-    console.log('PropertyDetails: Current URL:', window.location.href);
     
     const fetchProperty = async () => {
       if (!id) {
@@ -59,11 +52,6 @@ const PropertyDetails = () => {
     
     fetchProperty();
   }, [id, getPropertyById]);
-
-  // Add additional logging for debugging
-  useEffect(() => {
-    console.log('PropertyDetails: State updated - loading:', loading, 'property:', property, 'error:', error);
-  }, [loading, property, error]);
 
   if (loading) {
     console.log('PropertyDetails: Rendering loading state');
@@ -105,9 +93,15 @@ const PropertyDetails = () => {
 
   console.log('PropertyDetails: Rendering property details for:', property.id);
 
-  const images = property.property_photos?.map(photo => photo.photo_url) || [
-    "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop"
-  ];
+  const formatPrice = (price: number | null) => {
+    if (!price) return 'Price on request';
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
@@ -152,47 +146,57 @@ const PropertyDetails = () => {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Main Content */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* Image Gallery */}
-            <PropertyImageGallery images={images} address={property.address} />
-
-            {/* Property Info */}
-            <div className="animate-fade-in">
-              <div className="flex items-start justify-between mb-4">
-                <div>
-                  <h1 className="text-3xl font-bold text-gray-900 mb-2">{property.address}</h1>
-                  <p className="text-gray-600 flex items-center">
-                    <MapPin className="w-4 h-4 mr-1" />
-                    {property.city}, {property.state} {property.zip_code}
-                  </p>
-                </div>
-                <div className="flex items-center space-x-1">
-                  <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="font-semibold">4.9</span>
-                  <span className="text-gray-600">(127 reviews)</span>
-                </div>
-              </div>
-
-              {/* Property Stats */}
-              <PropertyInfoCard property={property} />
-
-              {/* AI Insights */}
-              <PropertyAIInsights property={property} />
-
-              {/* Amenities */}
-              <PropertyAmenities property={property} />
-
-              {/* Host Info */}
-              <PropertyHostInfo property={property} />
-            </div>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Simplified Property Content */}
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          {/* Basic Property Image */}
+          <div className="relative h-96">
+            <img 
+              src={property.property_photos?.[0]?.photo_url || "https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop"}
+              alt={property.address}
+              className="w-full h-full object-cover"
+            />
           </div>
 
-          {/* Booking Sidebar */}
-          <div className="lg:col-span-1">
-            <PropertyBookingSidebar property={property} />
+          {/* Basic Property Info */}
+          <div className="p-8">
+            <div className="mb-6">
+              <h1 className="text-3xl font-bold text-gray-900 mb-2">{property.address}</h1>
+              <p className="text-gray-600 flex items-center text-lg">
+                <MapPin className="w-5 h-5 mr-2" />
+                {property.city}, {property.state} {property.zip_code}
+              </p>
+            </div>
+
+            <div className="mb-6">
+              <span className="text-4xl font-bold text-purple-600">
+                {formatPrice(property.current_value)}
+              </span>
+              {property.listing_type && (
+                <span className="text-gray-600 ml-2">
+                  for {property.listing_type}
+                </span>
+              )}
+            </div>
+
+            <div className="flex flex-wrap gap-6 text-gray-600">
+              {property.bedrooms && (
+                <span>{property.bedrooms} bedrooms</span>
+              )}
+              {property.bathrooms && (
+                <span>{property.bathrooms} bathrooms</span>
+              )}
+              {property.square_feet && (
+                <span>{property.square_feet.toLocaleString()} sq ft</span>
+              )}
+              {property.year_built && (
+                <span>Built in {property.year_built}</span>
+              )}
+            </div>
+
+            <div className="mt-8 text-center">
+              <p className="text-gray-500">More details coming soon...</p>
+            </div>
           </div>
         </div>
       </div>
