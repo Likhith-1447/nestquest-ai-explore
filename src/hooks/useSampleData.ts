@@ -1,59 +1,61 @@
 
 import { useState } from 'react';
-import { sampleProperties, sampleNeighborhoods } from '@/data/sampleProperties';
 import { EnhancedProperty } from '@/hooks/usePropertyData';
+import { sampleProperties } from '@/data/sampleProperties';
 
 export const useSampleData = () => {
-  const [isLoading, setIsLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const loadSampleProperties = async (searchQuery?: string): Promise<EnhancedProperty[]> => {
-    setIsLoading(true);
+    console.log('useSampleData: Loading sample properties with query:', searchQuery);
+    setLoading(true);
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    let filteredProperties = [...sampleProperties];
-    
-    // Filter based on search query if provided
-    if (searchQuery && searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filteredProperties = sampleProperties.filter(property => 
-        property.address?.toLowerCase().includes(query) ||
-        property.city?.toLowerCase().includes(query) ||
-        property.state?.toLowerCase().includes(query) ||
-        property.property_type?.toLowerCase().includes(query) ||
-        (query.includes('pool') && property.pool) ||
-        (query.includes('luxury') && (property.current_value || 0) > 1000000) ||
-        (query.includes('mountain') && (property.city?.toLowerCase().includes('aspen') || property.city?.toLowerCase().includes('vail'))) ||
-        (query.includes('cabin') && property.property_type === 'cabin') ||
-        (query.includes('condo') && property.property_type === 'condo') ||
-        (query.includes('townhouse') && property.property_type === 'townhouse') ||
-        (query.includes('apartment') && property.property_type === 'apartment') ||
-        (query.includes('commercial') && property.property_type === 'commercial')
-      );
+    try {
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      let filteredProperties = [...sampleProperties];
+      
+      if (searchQuery) {
+        const query = searchQuery.toLowerCase();
+        filteredProperties = sampleProperties.filter(property => 
+          property.address.toLowerCase().includes(query) ||
+          property.city.toLowerCase().includes(query) ||
+          property.state.toLowerCase().includes(query) ||
+          property.property_type?.toLowerCase().includes(query) ||
+          (query.includes('mountain') && (property.city.toLowerCase().includes('aspen') || property.state.toLowerCase() === 'co')) ||
+          (query.includes('cabin') && property.property_type?.toLowerCase().includes('cabin')) ||
+          (query.includes('luxury') && (property.current_value || 0) > 1000000) ||
+          (query.includes('beach') && property.city.toLowerCase().includes('miami')) ||
+          (query.includes('waterfront') && property.city.toLowerCase().includes('miami'))
+        );
+      }
+      
+      console.log('useSampleData: Filtered properties count:', filteredProperties.length);
+      return filteredProperties;
+    } finally {
+      setLoading(false);
     }
-    
-    setIsLoading(false);
-    return filteredProperties;
   };
 
   const getPropertyById = async (id: string): Promise<EnhancedProperty | null> => {
-    setIsLoading(true);
+    console.log('useSampleData: Getting property by ID:', id);
     
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 300));
-    
+    // Find property by ID in sample data
     const property = sampleProperties.find(p => p.id === id);
     
-    setIsLoading(false);
-    return property || null;
+    if (property) {
+      console.log('useSampleData: Found property:', property.address);
+      return property;
+    }
+    
+    console.log('useSampleData: Property not found');
+    return null;
   };
 
   return {
     loadSampleProperties,
     getPropertyById,
-    isLoading,
-    sampleProperties,
-    sampleNeighborhoods
+    loading
   };
 };

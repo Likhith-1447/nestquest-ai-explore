@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { usePropertyAI } from '@/hooks/usePropertyAI';
 import { usePropertyData } from '@/hooks/usePropertyData';
@@ -28,6 +28,10 @@ const SearchResults = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [activeTab, setActiveTab] = useState('results');
+  const [hasInitialized, setHasInitialized] = useState(false);
+  
+  // Use ref to track if we've already searched for the current query
+  const lastSearchQuery = useRef<string>('');
   
   const { 
     properties, 
@@ -40,17 +44,31 @@ const SearchResults = () => {
   const { analyzeProperties, aiInsights, isLoading: aiLoading, error: aiError, clearInsights } = usePropertyAI();
   const { searchHistory, addSearchQuery } = useSearchHistory();
 
-  // Trigger search when component mounts or query changes
+  // Only trigger search when component mounts or when search query actually changes
   useEffect(() => {
-    handleSearch();
-  }, [searchQuery]);
+    console.log('SearchResults: useEffect triggered', { searchQuery, lastSearchQuery: lastSearchQuery.current, hasInitialized });
+    
+    // Only search if the query has actually changed or this is the first load
+    if (!hasInitialized || (searchQuery !== lastSearchQuery.current && searchQuery.trim())) {
+      console.log('SearchResults: Performing search for:', searchQuery);
+      handleSearch();
+      setHasInitialized(true);
+    }
+  }, [searchQuery, hasInitialized]);
 
   const handleSearch = async () => {
-    setCurrentPage(1);
-    if (searchQuery.trim()) {
+    if (searchQuery.trim() && searchQuery !== lastSearchQuery.current) {
+      console.log('SearchResults: Starting search for query:', searchQuery);
+      lastSearchQuery.current = searchQuery;
+      setCurrentPage(1);
+      
       await searchProperties(searchQuery);
       await addSearchQuery(searchQuery);
-      analyzeProperties(searchQuery, properties.slice(0, 10), 'sale');
+      
+      // Only analyze properties if we have results
+      if (properties.length > 0) {
+        analyzeProperties(searchQuery, properties.slice(0, 10), 'sale');
+      }
     }
   };
 
@@ -59,14 +77,15 @@ const SearchResults = () => {
     try {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const moreSearchTerms = [
-        'luxury homes', 'condos', 'townhouses', 'waterfront properties',
-        'ski properties', 'mountain homes', 'downtown lofts', 'family homes'
+      // Use consistent additional search terms instead of random ones
+      const additionalTerms = [
+        'luxury homes', 'family homes', 'waterfront properties'
       ];
       
-      const randomTerm = moreSearchTerms[Math.floor(Math.random() * moreSearchTerms.length)];
-      await searchProperties(`${searchQuery} ${randomTerm}`);
+      const pageIndex = (currentPage - 1) % additionalTerms.length;
+      const additionalTerm = additionalTerms[pageIndex];
       
+      await searchProperties(`${searchQuery} ${additionalTerm}`);
       setCurrentPage(prev => prev + 1);
     } catch (error) {
       console.error('Error loading more properties:', error);
@@ -81,17 +100,23 @@ const SearchResults = () => {
   };
 
   const handleAIRefresh = () => {
-    analyzeProperties(searchQuery, properties.slice(0, 10), 'sale');
+    if (properties.length > 0) {
+      analyzeProperties(searchQuery, properties.slice(0, 10), 'sale');
+    }
   };
 
   const handleNewSearch = () => {
+    console.log('SearchResults: Handling new search');
     clearInsights();
     setCurrentPage(1);
+    lastSearchQuery.current = ''; // Reset to force new search
     handleSearch();
   };
 
   const handleHistoryItemClick = (query: string) => {
+    console.log('SearchResults: History item clicked:', query);
     setSearchQuery(query);
+    lastSearchQuery.current = ''; // Reset to force new search
     handleNewSearch();
   };
 
