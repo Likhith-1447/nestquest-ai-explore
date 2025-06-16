@@ -206,8 +206,8 @@ const PropertyDetails = () => {
                   {property.property_features.map((feature) => (
                     <div key={feature.id} className="bg-gray-50 p-4 rounded-lg hover:bg-gray-100 transition-colors duration-200">
                       <h4 className="font-medium text-gray-900">{feature.feature_name}</h4>
-                      {feature.feature_description && (
-                        <p className="text-sm text-gray-600 mt-1">{feature.feature_description}</p>
+                      {feature.feature_value && (
+                        <p className="text-sm text-gray-600 mt-1">{feature.feature_value}</p>
                       )}
                     </div>
                   ))}

@@ -38,16 +38,16 @@ export const sampleProperties: EnhancedProperty[] = [
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
     property_photos: [
-      { id: 'photo1', property_id: '550e8400-e29b-41d4-a716-446655440001', photo_url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, caption: 'Front view', created_at: '2024-01-15T10:00:00Z' },
-      { id: 'photo2', property_id: '550e8400-e29b-41d4-a716-446655440001', photo_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop', is_primary: false, photo_order: 2, caption: 'Living room', created_at: '2024-01-15T10:00:00Z' },
-      { id: 'photo3', property_id: '550e8400-e29b-41d4-a716-446655440001', photo_url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop', is_primary: false, photo_order: 3, caption: 'Kitchen', created_at: '2024-01-15T10:00:00Z' }
+      { id: 'photo1', property_id: '550e8400-e29b-41d4-a716-446655440001', photo_url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' },
+      { id: 'photo2', property_id: '550e8400-e29b-41d4-a716-446655440001', photo_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop', is_primary: false, photo_order: 2, created_at: '2024-01-15T10:00:00Z' },
+      { id: 'photo3', property_id: '550e8400-e29b-41d4-a716-446655440001', photo_url: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&h=600&fit=crop', is_primary: false, photo_order: 3, created_at: '2024-01-15T10:00:00Z' }
     ],
     property_features: [
-      { id: 'feat1', property_id: '550e8400-e29b-41d4-a716-446655440001', feature_name: 'Swimming Pool', feature_category: 'Outdoor', feature_description: 'Large heated pool with spa', created_at: '2024-01-15T10:00:00Z' },
-      { id: 'feat2', property_id: '550e8400-e29b-41d4-a716-446655440001', feature_name: 'Walk-in Closets', feature_category: 'Interior', feature_description: 'Multiple walk-in closets', created_at: '2024-01-15T10:00:00Z' }
+      { id: 'feat1', property_id: '550e8400-e29b-41d4-a716-446655440001', feature_name: 'Swimming Pool', feature_type: 'Outdoor', feature_value: 'Large heated pool with spa', created_at: '2024-01-15T10:00:00Z' },
+      { id: 'feat2', property_id: '550e8400-e29b-41d4-a716-446655440001', feature_name: 'Walk-in Closets', feature_type: 'Interior', feature_value: 'Multiple walk-in closets', created_at: '2024-01-15T10:00:00Z' }
     ],
     property_market_data: [
-      { id: 'market1', property_id: '550e8400-e29b-41d4-a716-446655440001', price_per_sqft: 556, days_on_market: 45, market_trends: 'Rising', comparable_sales: 8, created_at: '2024-01-15T10:00:00Z' }
+      { id: 'market1', property_id: '550e8400-e29b-41d4-a716-446655440001', price_estimate: 2500000, days_on_market: 45, market_trends: { trend: 'Rising' }, price_history: {}, estimated_monthly_costs: {}, rental_estimate: null, data_source: 'sample', last_updated: '2024-01-15T10:00:00Z', property_taxes: 25000, tax_year: 2024 }
     ]
   },
   {
@@ -86,15 +86,15 @@ export const sampleProperties: EnhancedProperty[] = [
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
     property_photos: [
-      { id: 'photo4', property_id: '550e8400-e29b-41d4-a716-446655440002', photo_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, caption: 'Mountain cabin exterior', created_at: '2024-01-15T10:00:00Z' },
-      { id: 'photo5', property_id: '550e8400-e29b-41d4-a716-446655440002', photo_url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop', is_primary: false, photo_order: 2, caption: 'Cozy interior', created_at: '2024-01-15T10:00:00Z' }
+      { id: 'photo4', property_id: '550e8400-e29b-41d4-a716-446655440002', photo_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' },
+      { id: 'photo5', property_id: '550e8400-e29b-41d4-a716-446655440002', photo_url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop', is_primary: false, photo_order: 2, created_at: '2024-01-15T10:00:00Z' }
     ],
     property_features: [
-      { id: 'feat3', property_id: '550e8400-e29b-41d4-a716-446655440002', feature_name: 'Mountain Views', feature_category: 'View', feature_description: 'Stunning 360-degree mountain views', created_at: '2024-01-15T10:00:00Z' },
-      { id: 'feat4', property_id: '550e8400-e29b-41d4-a716-446655440002', feature_name: 'Ski Access', feature_category: 'Outdoor', feature_description: 'Direct ski-in/ski-out access', created_at: '2024-01-15T10:00:00Z' }
+      { id: 'feat3', property_id: '550e8400-e29b-41d4-a716-446655440002', feature_name: 'Mountain Views', feature_type: 'View', feature_value: 'Stunning 360-degree mountain views', created_at: '2024-01-15T10:00:00Z' },
+      { id: 'feat4', property_id: '550e8400-e29b-41d4-a716-446655440002', feature_name: 'Ski Access', feature_type: 'Outdoor', feature_value: 'Direct ski-in/ski-out access', created_at: '2024-01-15T10:00:00Z' }
     ],
     property_market_data: [
-      { id: 'market2', property_id: '550e8400-e29b-41d4-a716-446655440002', price_per_sqft: 818, days_on_market: 62, market_trends: 'Stable', comparable_sales: 4, created_at: '2024-01-15T10:00:00Z' }
+      { id: 'market2', property_id: '550e8400-e29b-41d4-a716-446655440002', price_estimate: 1800000, days_on_market: 62, market_trends: { trend: 'Stable' }, price_history: {}, estimated_monthly_costs: {}, rental_estimate: null, data_source: 'sample', last_updated: '2024-01-15T10:00:00Z', property_taxes: 18000, tax_year: 2024 }
     ]
   },
   {
@@ -133,7 +133,7 @@ export const sampleProperties: EnhancedProperty[] = [
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
     property_photos: [
-      { id: 'photo6', property_id: '550e8400-e29b-41d4-a716-446655440003', photo_url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, caption: 'Modern loft living', created_at: '2024-01-15T10:00:00Z' }
+      { id: 'photo6', property_id: '550e8400-e29b-41d4-a716-446655440003', photo_url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' }
     ]
   },
   {
@@ -172,7 +172,7 @@ export const sampleProperties: EnhancedProperty[] = [
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
     property_photos: [
-      { id: 'photo7', property_id: '550e8400-e29b-41d4-a716-446655440004', photo_url: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, caption: 'Victorian townhouse', created_at: '2024-01-15T10:00:00Z' }
+      { id: 'photo7', property_id: '550e8400-e29b-41d4-a716-446655440004', photo_url: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' }
     ]
   },
   {
@@ -211,7 +211,7 @@ export const sampleProperties: EnhancedProperty[] = [
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
     property_photos: [
-      { id: 'photo8', property_id: '550e8400-e29b-41d4-a716-446655440005', photo_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, caption: 'Oceanfront condo', created_at: '2024-01-15T10:00:00Z' }
+      { id: 'photo8', property_id: '550e8400-e29b-41d4-a716-446655440005', photo_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' }
     ]
   },
   {
@@ -250,7 +250,7 @@ export const sampleProperties: EnhancedProperty[] = [
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
     property_photos: [
-      { id: 'photo9', property_id: '550e8400-e29b-41d4-a716-446655440006', photo_url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, caption: 'Modern ranch home', created_at: '2024-01-15T10:00:00Z' }
+      { id: 'photo9', property_id: '550e8400-e29b-41d4-a716-446655440006', photo_url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' }
     ]
   },
   {
@@ -289,7 +289,7 @@ export const sampleProperties: EnhancedProperty[] = [
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
     property_photos: [
-      { id: 'photo10', property_id: '550e8400-e29b-41d4-a716-446655440007', photo_url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, caption: 'Modern office building', created_at: '2024-01-15T10:00:00Z' }
+      { id: 'photo10', property_id: '550e8400-e29b-41d4-a716-446655440007', photo_url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' }
     ]
   },
   {
@@ -328,7 +328,7 @@ export const sampleProperties: EnhancedProperty[] = [
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
     property_photos: [
-      { id: 'photo11', property_id: '550e8400-e29b-41d4-a716-446655440008', photo_url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, caption: 'Modern studio apartment', created_at: '2024-01-15T10:00:00Z' }
+      { id: 'photo11', property_id: '550e8400-e29b-41d4-a716-446655440008', photo_url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' }
     ]
   }
 ];
