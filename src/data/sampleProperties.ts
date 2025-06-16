@@ -30,6 +30,15 @@ export const sampleProperties: EnhancedProperty[] = [
     hoa_fee: 350,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
+    basement: false,
+    latitude: 34.0901,
+    longitude: -118.4065,
+    owner_name: null,
+    parking_spaces: 3,
+    walkability_score: 85,
+    transit_score: 70,
+    school_district: 'Beverly Hills Unified',
+    property_status: 'active',
     property_photos: [
       { id: 'photo1', property_id: '550e8400-e29b-41d4-a716-446655440001', photo_url: 'https://images.unsplash.com/photo-1613490493576-7fde63acd811?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' },
       { id: 'photo2', property_id: '550e8400-e29b-41d4-a716-446655440001', photo_url: 'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=800&h=600&fit=crop', is_primary: false, photo_order: 2, created_at: '2024-01-15T10:00:00Z' },
@@ -40,7 +49,7 @@ export const sampleProperties: EnhancedProperty[] = [
       { id: 'feat2', property_id: '550e8400-e29b-41d4-a716-446655440001', feature_name: 'Walk-in Closets', feature_type: 'Interior', feature_value: 'Multiple walk-in closets', created_at: '2024-01-15T10:00:00Z' }
     ],
     property_market_data: [
-      { id: 'market1', property_id: '550e8400-e29b-41d4-a716-446655440001', price_estimate: 2500000, days_on_market: 45, market_trends: { trend: 'Rising' }, price_history: {}, estimated_monthly_costs: {}, rent_estimate: null, data_source: 'sample', last_updated: '2024-01-15T10:00:00Z', tax_assessment: 25000, tax_year: 2024 }
+      { id: 'market1', property_id: '550e8400-e29b-41d4-a716-446655440001', price_estimate: 2500000, days_on_market: 45, market_trends: { trend: 'Rising' }, price_history: {}, estimated_monthly_costs: {}, rent_estimate: null, data_source: 'sample', last_updated: '2024-01-15T10:00:00Z', tax_assessment: 25000, tax_year: 2024, price_per_sqft: 556 }
     ]
   },
   {
@@ -71,6 +80,15 @@ export const sampleProperties: EnhancedProperty[] = [
     hoa_fee: 0,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
+    basement: false,
+    latitude: 39.1911,
+    longitude: -106.8175,
+    owner_name: null,
+    parking_spaces: 2,
+    walkability_score: 70,
+    transit_score: 45,
+    school_district: 'Aspen School District',
+    property_status: 'active',
     property_photos: [
       { id: 'photo4', property_id: '550e8400-e29b-41d4-a716-446655440002', photo_url: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' },
       { id: 'photo5', property_id: '550e8400-e29b-41d4-a716-446655440002', photo_url: 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=800&h=600&fit=crop', is_primary: false, photo_order: 2, created_at: '2024-01-15T10:00:00Z' }
@@ -80,7 +98,7 @@ export const sampleProperties: EnhancedProperty[] = [
       { id: 'feat4', property_id: '550e8400-e29b-41d4-a716-446655440002', feature_name: 'Ski Access', feature_type: 'Outdoor', feature_value: 'Direct ski-in/ski-out access', created_at: '2024-01-15T10:00:00Z' }
     ],
     property_market_data: [
-      { id: 'market2', property_id: '550e8400-e29b-41d4-a716-446655440002', price_estimate: 1800000, days_on_market: 62, market_trends: { trend: 'Stable' }, price_history: {}, estimated_monthly_costs: {}, rent_estimate: null, data_source: 'sample', last_updated: '2024-01-15T10:00:00Z', tax_assessment: 18000, tax_year: 2024 }
+      { id: 'market2', property_id: '550e8400-e29b-41d4-a716-446655440002', price_estimate: 1800000, days_on_market: 62, market_trends: { trend: 'Stable' }, price_history: {}, estimated_monthly_costs: {}, rent_estimate: null, data_source: 'sample', last_updated: '2024-01-15T10:00:00Z', tax_assessment: 18000, tax_year: 2024, price_per_sqft: 818 }
     ]
   },
   {
@@ -111,6 +129,15 @@ export const sampleProperties: EnhancedProperty[] = [
     hoa_fee: 800,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
+    basement: false,
+    latitude: 40.7505,
+    longitude: -73.9934,
+    owner_name: null,
+    parking_spaces: 1,
+    walkability_score: 95,
+    transit_score: 90,
+    school_district: 'NYC Department of Education District 2',
+    property_status: 'active',
     property_photos: [
       { id: 'photo6', property_id: '550e8400-e29b-41d4-a716-446655440003', photo_url: 'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' }
     ]
@@ -143,6 +170,15 @@ export const sampleProperties: EnhancedProperty[] = [
     hoa_fee: 450,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
+    basement: true,
+    latitude: 37.7749,
+    longitude: -122.4194,
+    owner_name: null,
+    parking_spaces: 2,
+    walkability_score: 88,
+    transit_score: 85,
+    school_district: 'San Francisco Unified School District',
+    property_status: 'active',
     property_photos: [
       { id: 'photo7', property_id: '550e8400-e29b-41d4-a716-446655440004', photo_url: 'https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' }
     ]
@@ -175,6 +211,15 @@ export const sampleProperties: EnhancedProperty[] = [
     hoa_fee: 1200,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
+    basement: false,
+    latitude: 25.7907,
+    longitude: -80.1300,
+    owner_name: null,
+    parking_spaces: 2,
+    walkability_score: 75,
+    transit_score: 60,
+    school_district: 'Miami-Dade County Public Schools',
+    property_status: 'active',
     property_photos: [
       { id: 'photo8', property_id: '550e8400-e29b-41d4-a716-446655440005', photo_url: 'https://images.unsplash.com/photo-1512917774080-9991f1c4c750?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' }
     ]
@@ -207,6 +252,15 @@ export const sampleProperties: EnhancedProperty[] = [
     hoa_fee: 0,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
+    basement: false,
+    latitude: 30.2672,
+    longitude: -97.7431,
+    owner_name: null,
+    parking_spaces: 3,
+    walkability_score: 65,
+    transit_score: 50,
+    school_district: 'Austin Independent School District',
+    property_status: 'active',
     property_photos: [
       { id: 'photo9', property_id: '550e8400-e29b-41d4-a716-446655440006', photo_url: 'https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' }
     ]
@@ -239,6 +293,15 @@ export const sampleProperties: EnhancedProperty[] = [
     hoa_fee: 0,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
+    basement: false,
+    latitude: 47.6062,
+    longitude: -122.3321,
+    owner_name: null,
+    parking_spaces: 50,
+    walkability_score: 90,
+    transit_score: 85,
+    school_district: 'Seattle Public Schools',
+    property_status: 'active',
     property_photos: [
       { id: 'photo10', property_id: '550e8400-e29b-41d4-a716-446655440007', photo_url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' }
     ]
@@ -271,6 +334,15 @@ export const sampleProperties: EnhancedProperty[] = [
     hoa_fee: 350,
     created_at: '2024-01-15T10:00:00Z',
     updated_at: '2024-06-01T15:30:00Z',
+    basement: false,
+    latitude: 34.0928,
+    longitude: -118.3287,
+    owner_name: null,
+    parking_spaces: 1,
+    walkability_score: 80,
+    transit_score: 75,
+    school_district: 'Los Angeles Unified School District',
+    property_status: 'active',
     property_photos: [
       { id: 'photo11', property_id: '550e8400-e29b-41d4-a716-446655440008', photo_url: 'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&h=600&fit=crop', is_primary: true, photo_order: 1, created_at: '2024-01-15T10:00:00Z' }
     ]
