@@ -15,11 +15,9 @@ const PropertyDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isLiked, setIsLiked] = useState(false);
-  const [imageLoaded, setImageLoaded] = useState(false);
 
   useEffect(() => {
-    console.log('PropertyDetails: Component mounted');
-    console.log('PropertyDetails: URL params ID:', id);
+    console.log('PropertyDetails: Component mounted with ID:', id);
     
     const fetchProperty = async () => {
       if (!id) {
@@ -54,7 +52,7 @@ const PropertyDetails = () => {
     };
     
     fetchProperty();
-  }, [id, getPropertyById]);
+  }, [id]); // Removed getPropertyById from dependency array to prevent infinite re-renders
 
   if (loading) {
     console.log('PropertyDetails: Rendering loading state');
@@ -62,7 +60,7 @@ const PropertyDetails = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
         <div className="text-center">
           <div className="w-16 h-16 bg-gradient-to-r from-purple-600 to-blue-600 rounded-full mx-auto mb-4 animate-pulse"></div>
-          <p className="text-gray-600 animate-fade-in">Loading property details...</p>
+          <p className="text-gray-600">Loading property details...</p>
           <p className="text-sm text-gray-500 mt-2">Property ID: {id}</p>
         </div>
       </div>
@@ -73,7 +71,7 @@ const PropertyDetails = () => {
     console.log('PropertyDetails: Rendering error state - error:', error, 'property:', property);
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 flex items-center justify-center">
-        <div className="text-center animate-fade-in max-w-md">
+        <div className="text-center max-w-md">
           <h1 className="text-2xl font-bold text-gray-900 mb-2">Property Not Found</h1>
           <p className="text-gray-600 mb-2">
             {error || "The property you're looking for doesn't exist."}
@@ -94,7 +92,7 @@ const PropertyDetails = () => {
     );
   }
 
-  console.log('PropertyDetails: Rendering property details for:', property.id);
+  console.log('PropertyDetails: Successfully rendering property details for:', property.id);
 
   const formatPrice = (price: number | null) => {
     if (!price) return 'Price on request';
