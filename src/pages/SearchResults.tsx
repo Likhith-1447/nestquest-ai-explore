@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { usePropertyAI } from '@/hooks/usePropertyAI';
@@ -14,6 +13,13 @@ import { AIAssistant } from '@/components/AIAssistant';
 import { AIRecommendations } from '@/components/AIRecommendations';
 import { AIPropertyComparison } from '@/components/AIPropertyComparison';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+
+import { AIInvestmentAnalysis } from '@/components/ai/AIInvestmentAnalysis';
+import { NeighborhoodInsights } from '@/components/ai/NeighborhoodInsights';
+import { PricePredictionTool } from '@/components/ai/PricePredictionTool';
+import { EnvironmentalImpact } from '@/components/ai/EnvironmentalImpact';
+import { SmartRecommendationEngine } from '@/components/ai/SmartRecommendationEngine';
+import { AIImpactDashboard } from '@/components/ai/AIImpactDashboard';
 
 // Persistent storage for the last search query
 let lastPersistedQuery = '';
@@ -179,11 +185,15 @@ const SearchResults = () => {
 
         <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-            <TabsList className="grid w-full grid-cols-4 hover-scale">
-              <TabsTrigger value="results" className="transition-all duration-300 hover:scale-105">Property Results</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-8 hover-scale">
+              <TabsTrigger value="results" className="transition-all duration-300 hover:scale-105">Properties</TabsTrigger>
               <TabsTrigger value="ai-insights" className="transition-all duration-300 hover:scale-105">AI Insights</TabsTrigger>
-              <TabsTrigger value="comparison" className="transition-all duration-300 hover:scale-105">AI Compare</TabsTrigger>
-              <TabsTrigger value="map" className="transition-all duration-300 hover:scale-105">Map View</TabsTrigger>
+              <TabsTrigger value="comparison" className="transition-all duration-300 hover:scale-105">Compare</TabsTrigger>
+              <TabsTrigger value="smart-recommendations" className="transition-all duration-300 hover:scale-105">Smart AI</TabsTrigger>
+              <TabsTrigger value="price-prediction" className="transition-all duration-300 hover:scale-105">Price AI</TabsTrigger>
+              <TabsTrigger value="neighborhood" className="transition-all duration-300 hover:scale-105">Neighborhood</TabsTrigger>
+              <TabsTrigger value="ai-impact" className="transition-all duration-300 hover:scale-105">AI Impact</TabsTrigger>
+              <TabsTrigger value="map" className="transition-all duration-300 hover:scale-105">Map</TabsTrigger>
             </TabsList>
 
             <TabsContent value="results" className="animate-scale-in">
@@ -234,6 +244,53 @@ const SearchResults = () => {
                 properties={sortedProperties}
                 onSelectProperty={(property) => window.location.href = `/property/${property.id}`}
               />
+            </TabsContent>
+
+            <TabsContent value="smart-recommendations" className="animate-scale-in">
+              <SmartRecommendationEngine
+                properties={sortedProperties}
+                onSelectProperty={(property) => window.location.href = `/property/${property.id}`}
+              />
+            </TabsContent>
+
+            <TabsContent value="price-prediction" className="animate-scale-in">
+              <div className="space-y-6">
+                <PricePredictionTool />
+                {sortedProperties.length > 0 && (
+                  <div className="space-y-4">
+                    <h3 className="text-lg font-semibold">Property-Specific Analysis</h3>
+                    {sortedProperties.slice(0, 2).map(property => (
+                      <div key={property.id} className="space-y-4">
+                        <h4 className="font-medium">{property.address}</h4>
+                        <div className="grid md:grid-cols-2 gap-6">
+                          <AIInvestmentAnalysis property={property} />
+                          <EnvironmentalImpact property={property} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="neighborhood" className="animate-scale-in">
+              <div className="space-y-6">
+                {sortedProperties.length > 0 && (
+                  <>
+                    <NeighborhoodInsights location={`${sortedProperties[0].city}, ${sortedProperties[0].state}`} />
+                    {sortedProperties.slice(0, 3).map(property => (
+                      <NeighborhoodInsights 
+                        key={property.id}
+                        location={`${property.city}, ${property.state}`}
+                      />
+                    ))}
+                  </>
+                )}
+              </div>
+            </TabsContent>
+
+            <TabsContent value="ai-impact" className="animate-scale-in">
+              <AIImpactDashboard />
             </TabsContent>
 
             <TabsContent value="map" className="animate-scale-in">
