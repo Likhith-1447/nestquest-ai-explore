@@ -15,10 +15,16 @@ import { AIRecommendations } from '@/components/AIRecommendations';
 import { AIPropertyComparison } from '@/components/AIPropertyComparison';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
+// Persistent storage for the last search query
+let lastPersistedQuery = '';
+
 const SearchResults = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const initialQuery = searchParams.get('q') || 'Mountain cabins in Colorado';
+  const urlQuery = searchParams.get('q');
+  
+  // Use URL query if available, otherwise use the last persisted query, with fallback
+  const initialQuery = urlQuery || lastPersistedQuery || 'Mountain cabins in Colorado';
   
   const [showFilters, setShowFilters] = useState(false);
   const [showMap, setShowMap] = useState(false);
@@ -45,13 +51,29 @@ const SearchResults = () => {
 
   // Handle search on mount and when query changes in URL
   useEffect(() => {
-    const urlQuery = searchParams.get('q') || 'Mountain cabins in Colorado';
+    const currentUrlQuery = searchParams.get('q');
     
-    // Only search if this is a new query or initial load
-    if (isInitialLoad.current || (urlQuery !== lastSearchQuery.current && urlQuery.trim())) {
-      console.log('SearchResults: Performing search for query:', urlQuery);
-      setSearchQuery(urlQuery);
-      performSearch(urlQuery);
+    // If there's a URL query, use it and persist it
+    if (currentUrlQuery) {
+      lastPersistedQuery = currentUrlQuery;
+      setSearchQuery(currentUrlQuery);
+      
+      // Only search if this is a new query or initial load
+      if (isInitialLoad.current || (currentUrlQuery !== lastSearchQuery.current)) {
+        console.log('SearchResults: Performing search for URL query:', currentUrlQuery);
+        performSearch(currentUrlQuery);
+        isInitialLoad.current = false;
+      }
+    } else if (isInitialLoad.current && lastPersistedQuery) {
+      // If no URL query but we have a persisted query, use it for initial load only
+      console.log('SearchResults: Using persisted query for initial load:', lastPersistedQuery);
+      setSearchQuery(lastPersistedQuery);
+      performSearch(lastPersistedQuery);
+      isInitialLoad.current = false;
+    } else if (isInitialLoad.current) {
+      // Only use fallback on very first visit with no history
+      console.log('SearchResults: Using fallback query for first visit');
+      performSearch(initialQuery);
       isInitialLoad.current = false;
     }
   }, [location.search]);
@@ -63,6 +85,7 @@ const SearchResults = () => {
 
     console.log('SearchResults: Starting search for query:', query);
     lastSearchQuery.current = query;
+    lastPersistedQuery = query; // Persist the query
     setHasSearched(true);
     
     try {
@@ -129,91 +152,99 @@ const SearchResults = () => {
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
-      <SearchHeader
-        searchQuery={searchQuery}
-        onSearchQueryChange={setSearchQuery}
-        onSearch={handleNewSearch}
-      />
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50 animate-fade-in">
+      <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+        <SearchHeader
+          searchQuery={searchQuery}
+          onSearchQueryChange={setSearchQuery}
+          onSearch={handleNewSearch}
+        />
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        <SearchControls
-          searchQuery={searchQuery}
-          propertiesCount={properties.length}
-          isLoading={propertiesLoading}
-          showFilters={showFilters}
-          onToggleFilters={() => setShowFilters(!showFilters)}
-          appliedFilters={appliedFilters}
-          sortBy={sortBy}
-          onSortChange={setSortBy}
-          showMap={showMap}
-          onToggleMap={() => setShowMap(!showMap)}
-        />
+        <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+          <SearchControls
+            searchQuery={searchQuery}
+            propertiesCount={properties.length}
+            isLoading={propertiesLoading}
+            showFilters={showFilters}
+            onToggleFilters={() => setShowFilters(!showFilters)}
+            appliedFilters={appliedFilters}
+            sortBy={sortBy}
+            onSortChange={setSortBy}
+            showMap={showMap}
+            onToggleMap={() => setShowMap(!showMap)}
+          />
+        </div>
 
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="results">Property Results</TabsTrigger>
-            <TabsTrigger value="ai-insights">AI Insights</TabsTrigger>
-            <TabsTrigger value="comparison">AI Compare</TabsTrigger>
-            <TabsTrigger value="map">Map View</TabsTrigger>
-          </TabsList>
+        <div className="animate-fade-in" style={{ animationDelay: '0.3s' }}>
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
+            <TabsList className="grid w-full grid-cols-4 hover-scale">
+              <TabsTrigger value="results" className="transition-all duration-300 hover:scale-105">Property Results</TabsTrigger>
+              <TabsTrigger value="ai-insights" className="transition-all duration-300 hover:scale-105">AI Insights</TabsTrigger>
+              <TabsTrigger value="comparison" className="transition-all duration-300 hover:scale-105">AI Compare</TabsTrigger>
+              <TabsTrigger value="map" className="transition-all duration-300 hover:scale-105">Map View</TabsTrigger>
+            </TabsList>
 
-          <TabsContent value="results">
-            {showMap ? (
+            <TabsContent value="results" className="animate-scale-in">
+              {showMap ? (
+                <div className="animate-fade-in">
+                  <MapView
+                    properties={sortedProperties}
+                    onPropertySelect={(property) => console.log('Selected property:', property)}
+                    isLoading={propertiesLoading}
+                  />
+                </div>
+              ) : (
+                <div className="flex flex-col lg:flex-row gap-6">
+                  {showFilters && (
+                    <div className="w-full lg:w-80 flex-shrink-0 animate-slide-in-right">
+                      <SearchSidebar
+                        onFiltersChange={handleFiltersChange}
+                        appliedFilters={appliedFilters}
+                        searchHistory={searchHistory}
+                        onHistoryItemClick={handleHistoryItemClick}
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex-1 min-w-0 animate-fade-in" style={{ animationDelay: '0.1s' }}>
+                    <SearchResultsGrid
+                      properties={sortedProperties}
+                      isLoading={propertiesLoading}
+                      error={propertiesError}
+                      aiInsights={aiInsights}
+                      aiLoading={aiLoading}
+                      aiError={aiError}
+                      onRefresh={() => fetchProperties()}
+                      onAIRefresh={handleAIRefresh}
+                      onClearFilters={() => setAppliedFilters({})}
+                    />
+                  </div>
+                </div>
+              )}
+            </TabsContent>
+
+            <TabsContent value="ai-insights" className="animate-scale-in">
+              <AIRecommendations searchQuery={searchQuery} />
+            </TabsContent>
+
+            <TabsContent value="comparison" className="animate-scale-in">
+              <AIPropertyComparison 
+                properties={sortedProperties}
+                onSelectProperty={(property) => window.location.href = `/property/${property.id}`}
+              />
+            </TabsContent>
+
+            <TabsContent value="map" className="animate-scale-in">
               <MapView
                 properties={sortedProperties}
                 onPropertySelect={(property) => console.log('Selected property:', property)}
                 isLoading={propertiesLoading}
               />
-            ) : (
-              <div className="flex flex-col lg:flex-row gap-6">
-                {showFilters && (
-                  <div className="w-full lg:w-80 flex-shrink-0">
-                    <SearchSidebar
-                      onFiltersChange={handleFiltersChange}
-                      appliedFilters={appliedFilters}
-                      searchHistory={searchHistory}
-                      onHistoryItemClick={handleHistoryItemClick}
-                    />
-                  </div>
-                )}
-
-                <div className="flex-1 min-w-0">
-                  <SearchResultsGrid
-                    properties={sortedProperties}
-                    isLoading={propertiesLoading}
-                    error={propertiesError}
-                    aiInsights={aiInsights}
-                    aiLoading={aiLoading}
-                    aiError={aiError}
-                    onRefresh={() => fetchProperties()}
-                    onAIRefresh={handleAIRefresh}
-                    onClearFilters={() => setAppliedFilters({})}
-                  />
-                </div>
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="ai-insights">
-            <AIRecommendations searchQuery={searchQuery} />
-          </TabsContent>
-
-          <TabsContent value="comparison">
-            <AIPropertyComparison 
-              properties={sortedProperties}
-              onSelectProperty={(property) => window.location.href = `/property/${property.id}`}
-            />
-          </TabsContent>
-
-          <TabsContent value="map">
-            <MapView
-              properties={sortedProperties}
-              onPropertySelect={(property) => console.log('Selected property:', property)}
-              isLoading={propertiesLoading}
-            />
-          </TabsContent>
-        </Tabs>
+            </TabsContent>
+          </Tabs>
+        </div>
       </div>
 
       <AIAssistant />

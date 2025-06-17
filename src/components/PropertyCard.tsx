@@ -48,43 +48,53 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group w-full h-full flex flex-col">
-      <PropertyCardImage
-        property={property}
-        showMarketData={showMarketData}
-        formatPrice={formatPrice}
-      />
-
-      <CardContent className="p-3 sm:p-4 lg:p-5 flex-1 flex flex-col">
-        <div className="flex-1">
-          <PropertyCardDetails
-            property={property}
-            formatPrice={formatPrice}
-          />
-
-          <PropertyCardFeatures property={property} />
-
-          <PropertyCardMarketData
+    <Card className="overflow-hidden hover:shadow-2xl transition-all duration-500 group w-full h-full flex flex-col animate-fade-in hover:scale-[1.02] cursor-pointer transform-gpu">
+      <div onClick={handleViewDetails} className="w-full h-full flex flex-col">
+        <div className="transform transition-transform duration-300 group-hover:-translate-y-1">
+          <PropertyCardImage
             property={property}
             showMarketData={showMarketData}
+            formatPrice={formatPrice}
           />
         </div>
 
-        <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
-          <div className="text-xs text-gray-500 hidden sm:block">
-            {property.property_type && (
-              <span className="capitalize">{property.property_type}</span>
-            )}
+        <CardContent className="p-3 sm:p-4 lg:p-5 flex-1 flex flex-col">
+          <div className="flex-1">
+            <div className="transform transition-transform duration-300 group-hover:translate-x-1">
+              <PropertyCardDetails
+                property={property}
+                formatPrice={formatPrice}
+              />
+            </div>
+
+            <div className="animate-fade-in" style={{ animationDelay: '0.1s' }}>
+              <PropertyCardFeatures property={property} />
+            </div>
+
+            <div className="animate-fade-in" style={{ animationDelay: '0.2s' }}>
+              <PropertyCardMarketData
+                property={property}
+                showMarketData={showMarketData}
+              />
+            </div>
           </div>
-          <Button 
-            size="sm" 
-            className="gradient-ai text-white hover:scale-105 transition-transform w-full sm:w-auto text-xs sm:text-sm"
-            onClick={handleViewDetails}
-          >
-            View Details
-          </Button>
-        </div>
-      </CardContent>
+
+          <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100 animate-fade-in" style={{ animationDelay: '0.3s' }}>
+            <div className="text-xs text-gray-500 hidden sm:block transition-colors duration-300 group-hover:text-gray-700">
+              {property.property_type && (
+                <span className="capitalize">{property.property_type}</span>
+              )}
+            </div>
+            <Button 
+              size="sm" 
+              className="gradient-ai text-white hover:scale-110 transition-all duration-300 w-full sm:w-auto text-xs sm:text-sm shadow-lg hover:shadow-xl transform-gpu"
+              onClick={handleViewDetails}
+            >
+              View Details
+            </Button>
+          </div>
+        </CardContent>
+      </div>
     </Card>
   );
 };
