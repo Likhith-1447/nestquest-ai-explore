@@ -18,9 +18,6 @@ interface SearchResultsGridProps {
   onRefresh: () => void;
   onAIRefresh: () => void;
   onClearFilters: () => void;
-  onLoadMore?: () => void;
-  isLoadingMore?: boolean;
-  hasMoreProperties?: boolean;
 }
 
 export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
@@ -32,10 +29,7 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
   aiError,
   onRefresh,
   onAIRefresh,
-  onClearFilters,
-  onLoadMore,
-  isLoadingMore = false,
-  hasMoreProperties = false
+  onClearFilters
 }) => {
   const navigate = useNavigate();
 
@@ -44,14 +38,16 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
   };
 
   return (
-    <div className="flex-1 w-full">
+    <div className="w-full">
       {/* AI Insights Banner */}
-      <AIInsightsBanner
-        insights={aiInsights}
-        isLoading={aiLoading}
-        error={aiError}
-        onRefresh={onAIRefresh}
-      />
+      <div className="mb-6">
+        <AIInsightsBanner
+          insights={aiInsights}
+          isLoading={aiLoading}
+          error={aiError}
+          onRefresh={onAIRefresh}
+        />
+      </div>
 
       {/* Error State */}
       {error && (
@@ -72,12 +68,12 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
 
       {/* Loading State */}
       {isLoading && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-          {[...Array(8)].map((_, i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 lg:gap-6">
+          {[...Array(5)].map((_, i) => (
             <Card key={i} className="overflow-hidden">
               <div className="animate-pulse">
-                <div className="bg-gray-200 h-40 sm:h-48 w-full"></div>
-                <CardContent className="p-3 sm:p-4">
+                <div className="bg-gray-200 h-48 sm:h-52 lg:h-56 w-full"></div>
+                <CardContent className="p-4">
                   <div className="space-y-3">
                     <div className="bg-gray-200 h-4 w-3/4 rounded"></div>
                     <div className="bg-gray-200 h-3 w-full rounded"></div>
@@ -92,62 +88,51 @@ export const SearchResultsGrid: React.FC<SearchResultsGridProps> = ({
 
       {/* Properties Grid */}
       {!isLoading && properties.length > 0 && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-4 lg:gap-6">
           {properties.map((property) => (
-            <PropertyCard
-              key={property.id}
-              property={property}
-              showMarketData={true}
-            />
+            <div key={property.id} className="w-full">
+              <PropertyCard
+                property={property}
+                showMarketData={true}
+              />
+            </div>
           ))}
         </div>
       )}
 
       {/* Empty State */}
       {!isLoading && !error && properties.length === 0 && (
-        <Card className="text-center py-8 sm:py-12 mx-4 sm:mx-0">
-          <CardContent className="px-4 sm:px-6">
+        <Card className="text-center py-12 mx-4 sm:mx-0">
+          <CardContent className="px-6">
             <MapPin className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">No properties found</h3>
-            <p className="text-gray-600 mb-4 text-sm sm:text-base">
-              Try adjusting your search criteria or filters to find more properties.
+            <h3 className="text-xl font-medium text-gray-900 mb-2">No properties found</h3>
+            <p className="text-gray-600 mb-6 text-base">
+              Try adjusting your search criteria or explore these popular searches.
             </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+            <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-2xl mx-auto">
               <Button onClick={onClearFilters} className="w-full sm:w-auto">
                 Clear Filters
               </Button>
-              <Button variant="outline" onClick={() => handleQuickSearch('luxury homes')} className="w-full sm:w-auto">
-                Search Luxury Homes
+              <Button variant="outline" onClick={() => handleQuickSearch('luxury homes beverly hills')} className="w-full sm:w-auto">
+                Beverly Hills Luxury
               </Button>
-              <Button variant="outline" onClick={() => handleQuickSearch('mountain cabins')} className="w-full sm:w-auto">
-                Search Mountain Cabins
+              <Button variant="outline" onClick={() => handleQuickSearch('mountain cabins colorado')} className="w-full sm:w-auto">
+                Mountain Cabins
+              </Button>
+              <Button variant="outline" onClick={() => handleQuickSearch('miami waterfront condos')} className="w-full sm:w-auto">
+                Miami Waterfront
               </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Load More */}
-      {!isLoading && properties.length > 0 && onLoadMore && (
-        <div className="text-center mt-8">
-          <Button 
-            variant="outline" 
-            size="lg"
-            onClick={onLoadMore}
-            disabled={isLoadingMore || !hasMoreProperties}
-            className="min-w-[200px] w-full sm:w-auto"
-          >
-            {isLoadingMore ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Loading More...
-              </>
-            ) : hasMoreProperties ? (
-              'Load More Properties'
-            ) : (
-              'No More Properties'
-            )}
-          </Button>
+      {/* Results Summary */}
+      {!isLoading && properties.length > 0 && (
+        <div className="mt-8 text-center text-gray-600">
+          <p className="text-sm">
+            Showing {properties.length} properties for your search
+          </p>
         </div>
       )}
     </div>

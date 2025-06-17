@@ -25,13 +25,12 @@ const SearchResults = () => {
   const [sortBy, setSortBy] = useState('newest');
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [appliedFilters, setAppliedFilters] = useState<SearchFiltersType>({});
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [activeTab, setActiveTab] = useState('results');
-  const [hasInitialized, setHasInitialized] = useState(false);
+  const [hasSearched, setHasSearched] = useState(false);
   
-  // Use ref to track if we've already searched for the current query
+  // Track the last search to prevent unnecessary re-searches
   const lastSearchQuery = useRef<string>('');
+  const isInitialLoad = useRef(true);
   
   const { 
     properties, 
@@ -44,54 +43,57 @@ const SearchResults = () => {
   const { analyzeProperties, aiInsights, isLoading: aiLoading, error: aiError, clearInsights } = usePropertyAI();
   const { searchHistory, addSearchQuery } = useSearchHistory();
 
-  // Only trigger search when component mounts or when search query actually changes
+  // Handle search on mount and when query changes in URL
   useEffect(() => {
-    console.log('SearchResults: useEffect triggered', { searchQuery, lastSearchQuery: lastSearchQuery.current, hasInitialized });
+    const urlQuery = searchParams.get('q') || 'Mountain cabins in Colorado';
     
-    // Only search if the query has actually changed or this is the first load
-    if (!hasInitialized || (searchQuery !== lastSearchQuery.current && searchQuery.trim())) {
-      console.log('SearchResults: Performing search for:', searchQuery);
-      handleSearch();
-      setHasInitialized(true);
+    // Only search if this is a new query or initial load
+    if (isInitialLoad.current || (urlQuery !== lastSearchQuery.current && urlQuery.trim())) {
+      console.log('SearchResults: Performing search for query:', urlQuery);
+      setSearchQuery(urlQuery);
+      performSearch(urlQuery);
+      isInitialLoad.current = false;
     }
-  }, [searchQuery, hasInitialized]);
+  }, [location.search]);
 
-  const handleSearch = async () => {
-    if (searchQuery.trim() && searchQuery !== lastSearchQuery.current) {
-      console.log('SearchResults: Starting search for query:', searchQuery);
-      lastSearchQuery.current = searchQuery;
-      setCurrentPage(1);
-      
-      await searchProperties(searchQuery);
-      await addSearchQuery(searchQuery);
-      
-      // Only analyze properties if we have results
-      if (properties.length > 0) {
-        analyzeProperties(searchQuery, properties.slice(0, 10), 'sale');
-      }
+  const performSearch = async (query: string) => {
+    if (!query.trim() || query === lastSearchQuery.current) {
+      return;
+    }
+
+    console.log('SearchResults: Starting search for query:', query);
+    lastSearchQuery.current = query;
+    setHasSearched(true);
+    
+    try {
+      await searchProperties(query);
+      await addSearchQuery(query);
+    } catch (error) {
+      console.error('SearchResults: Search failed:', error);
     }
   };
 
-  const handleLoadMore = async () => {
-    setIsLoadingMore(true);
-    try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Use consistent additional search terms instead of random ones
-      const additionalTerms = [
-        'luxury homes', 'family homes', 'waterfront properties'
-      ];
-      
-      const pageIndex = (currentPage - 1) % additionalTerms.length;
-      const additionalTerm = additionalTerms[pageIndex];
-      
-      await searchProperties(`${searchQuery} ${additionalTerm}`);
-      setCurrentPage(prev => prev + 1);
-    } catch (error) {
-      console.error('Error loading more properties:', error);
-    } finally {
-      setIsLoadingMore(false);
+  // Analyze properties when they change
+  useEffect(() => {
+    if (properties.length > 0 && hasSearched) {
+      analyzeProperties(searchQuery, properties, 'sale');
     }
+  }, [properties, hasSearched]);
+
+  const handleNewSearch = () => {
+    console.log('SearchResults: Handling new search for:', searchQuery);
+    clearInsights();
+    lastSearchQuery.current = ''; // Reset to allow new search
+    performSearch(searchQuery);
+  };
+
+  const handleHistoryItemClick = (query: string) => {
+    console.log('SearchResults: History item clicked:', query);
+    setSearchQuery(query);
+    window.history.pushState(null, '', `/search?q=${encodeURIComponent(query)}`);
+    clearInsights();
+    lastSearchQuery.current = ''; // Reset to allow new search
+    performSearch(query);
   };
 
   const handleFiltersChange = (filters: SearchFiltersType) => {
@@ -101,23 +103,8 @@ const SearchResults = () => {
 
   const handleAIRefresh = () => {
     if (properties.length > 0) {
-      analyzeProperties(searchQuery, properties.slice(0, 10), 'sale');
+      analyzeProperties(searchQuery, properties, 'sale');
     }
-  };
-
-  const handleNewSearch = () => {
-    console.log('SearchResults: Handling new search');
-    clearInsights();
-    setCurrentPage(1);
-    lastSearchQuery.current = ''; // Reset to force new search
-    handleSearch();
-  };
-
-  const handleHistoryItemClick = (query: string) => {
-    console.log('SearchResults: History item clicked:', query);
-    setSearchQuery(query);
-    lastSearchQuery.current = ''; // Reset to force new search
-    handleNewSearch();
   };
 
   const getAIRecommendationForProperty = (propertyId: string) => {
@@ -163,7 +150,6 @@ const SearchResults = () => {
           onToggleMap={() => setShowMap(!showMap)}
         />
 
-        {/* Enhanced AI-powered tabs */}
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-6">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="results">Property Results</TabsTrigger>
@@ -180,30 +166,31 @@ const SearchResults = () => {
                 isLoading={propertiesLoading}
               />
             ) : (
-              <div className="flex gap-8">
+              <div className="flex flex-col lg:flex-row gap-6">
                 {showFilters && (
-                  <SearchSidebar
-                    onFiltersChange={handleFiltersChange}
-                    appliedFilters={appliedFilters}
-                    searchHistory={searchHistory}
-                    onHistoryItemClick={handleHistoryItemClick}
-                  />
+                  <div className="w-full lg:w-80 flex-shrink-0">
+                    <SearchSidebar
+                      onFiltersChange={handleFiltersChange}
+                      appliedFilters={appliedFilters}
+                      searchHistory={searchHistory}
+                      onHistoryItemClick={handleHistoryItemClick}
+                    />
+                  </div>
                 )}
 
-                <SearchResultsGrid
-                  properties={sortedProperties}
-                  isLoading={propertiesLoading}
-                  error={propertiesError}
-                  aiInsights={aiInsights}
-                  aiLoading={aiLoading}
-                  aiError={aiError}
-                  onRefresh={() => fetchProperties()}
-                  onAIRefresh={handleAIRefresh}
-                  onClearFilters={() => setAppliedFilters({})}
-                  onLoadMore={handleLoadMore}
-                  isLoadingMore={isLoadingMore}
-                  hasMoreProperties={currentPage < 5}
-                />
+                <div className="flex-1 min-w-0">
+                  <SearchResultsGrid
+                    properties={sortedProperties}
+                    isLoading={propertiesLoading}
+                    error={propertiesError}
+                    aiInsights={aiInsights}
+                    aiLoading={aiLoading}
+                    aiError={aiError}
+                    onRefresh={() => fetchProperties()}
+                    onAIRefresh={handleAIRefresh}
+                    onClearFilters={() => setAppliedFilters({})}
+                  />
+                </div>
               </div>
             )}
           </TabsContent>
@@ -229,7 +216,6 @@ const SearchResults = () => {
         </Tabs>
       </div>
 
-      {/* AI Assistant - available on all pages */}
       <AIAssistant />
     </div>
   );

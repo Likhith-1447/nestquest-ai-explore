@@ -48,27 +48,29 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
   };
 
   return (
-    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group w-full max-w-sm mx-auto sm:max-w-none">
+    <Card className="overflow-hidden hover:shadow-xl transition-all duration-300 group w-full h-full flex flex-col">
       <PropertyCardImage
         property={property}
         showMarketData={showMarketData}
         formatPrice={formatPrice}
       />
 
-      <CardContent className="p-3 sm:p-4 lg:p-6">
-        <PropertyCardDetails
-          property={property}
-          formatPrice={formatPrice}
-        />
+      <CardContent className="p-3 sm:p-4 lg:p-5 flex-1 flex flex-col">
+        <div className="flex-1">
+          <PropertyCardDetails
+            property={property}
+            formatPrice={formatPrice}
+          />
 
-        <PropertyCardFeatures property={property} />
+          <PropertyCardFeatures property={property} />
 
-        <PropertyCardMarketData
-          property={property}
-          showMarketData={showMarketData}
-        />
+          <PropertyCardMarketData
+            property={property}
+            showMarketData={showMarketData}
+          />
+        </div>
 
-        <div className="flex items-center justify-between mt-4">
+        <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-100">
           <div className="text-xs text-gray-500 hidden sm:block">
             {property.property_type && (
               <span className="capitalize">{property.property_type}</span>
@@ -76,7 +78,7 @@ export const PropertyCard: React.FC<PropertyCardProps> = ({
           </div>
           <Button 
             size="sm" 
-            className="gradient-ai text-white hover:scale-105 transition-transform w-full sm:w-auto"
+            className="gradient-ai text-white hover:scale-105 transition-transform w-full sm:w-auto text-xs sm:text-sm"
             onClick={handleViewDetails}
           >
             View Details
