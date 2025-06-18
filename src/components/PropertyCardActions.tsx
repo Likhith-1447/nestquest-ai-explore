@@ -1,8 +1,9 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Heart, Share2, Eye, MapPin, Phone } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { useLikedProperties } from '@/hooks/useLikedProperties';
 
 interface PropertyCardActionsProps {
   propertyId: string;
@@ -17,16 +18,14 @@ export const PropertyCardActions: React.FC<PropertyCardActionsProps> = ({
   onViewDetails,
   className = ''
 }) => {
-  const [isSaved, setIsSaved] = useState(false);
   const { toast } = useToast();
+  const { isPropertyLiked, toggleLikedProperty } = useLikedProperties();
+  
+  const isSaved = isPropertyLiked(propertyId);
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsSaved(!isSaved);
-    toast({
-      title: isSaved ? "Removed from saved" : "Property saved",
-      description: isSaved ? "Property removed from your saved list" : "Property added to your saved list",
-    });
+    toggleLikedProperty(propertyId);
   };
 
   const handleShare = (e: React.MouseEvent) => {
