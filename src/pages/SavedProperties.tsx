@@ -99,7 +99,6 @@ const SavedProperties = () => {
               <PropertyCard
                 key={property.id}
                 property={property}
-                onClick={() => navigate(`/property/${property.id}`)}
               />
             ))}
           </div>
